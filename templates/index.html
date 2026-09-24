@@ -5,13 +5,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#06131b">
-  <meta name="description" content="A global online treasure hunt. Solve the final clue first and claim the $5,000 grand prize.">
+  <meta name="description" content="Internet Booty is an online puzzle treasure hunt. Follow clues, crack ciphers, uncover the final answer, and chase a $5,000 grand prize.">
   <link rel="canonical" href="https://internetbooty.com/">
   <meta property="og:title" content="Internet Booty presents The First Vault — $5,000 Online Treasure Hunt">
   <meta property="og:description" content="The vault opens soon. One final clue. One first solver. A $5,000 grand prize.">
   <meta property="og:url" content="https://internetbooty.com/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:image" content="https://images.stockcake.com/public/f/9/4/f94399c3-2270-4c9f-ba44-1e15b9c18a00_large/vault-door-treasure-stockcake.jpg">
+  <meta property="og:image:alt" content="A dark vault door glowing with golden light">
+  <meta name="twitter:title" content="Internet Booty — The First Vault">
+  <meta name="twitter:description" content="A hidden path. A $5,000 grand prize. The vault opens soon.">
+  <meta name="twitter:image" content="https://images.stockcake.com/public/f/9/4/f94399c3-2270-4c9f-ba44-1e15b9c18a00_large/vault-door-treasure-stockcake.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Internet Booty",
+    "url": "https://internetbooty.com/",
+    "description": "An online puzzle treasure hunt built around clues, ciphers, hidden patterns, and a final solution.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://internetbooty.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <title>{{ site_name }} — The First Vault {{ prize_amount }} Treasure Hunt</title>
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
@@ -143,9 +162,25 @@
           <span class="coin-inner">$5K</span>
         </div>
         <div class="prize-facts">
-          <div><span>⚓</span><b>GLOBAL</b><small>Online hunt</small></div>
+          <div><span>⚓</span><b>ONLINE</b><small>Internet hunt</small></div>
           <div><span>⌖</span><b>SKILL</b><small>Clues & ciphers</small></div>
           <div><span>♛</span><b>{{ prize_amount }}</b><small>Grand prize</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="share-section">
+      <div class="shell share-grid">
+        <div>
+          <p class="section-kicker">SPREAD THE RUMOR</p>
+          <h2>Every good treasure story starts as a whisper.</h2>
+          <p>Send the vault to someone who can't leave a riddle alone. The early path is still hidden somewhere on this page.</p>
+        </div>
+        <div class="share-actions">
+          <button class="primary" type="button" id="shareVault">SHARE THE VAULT →</button>
+          <a class="share-link" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=I%20found%20a%20%245%2C000%20online%20treasure%20hunt%20called%20Internet%20Booty.%20There%27s%20apparently%20a%20hidden%20early-access%20path%20on%20the%20homepage.&url=https%3A%2F%2Finternetbooty.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic%26utm_campaign%3Dfirst_vault">Post on X</a>
+          <a class="share-link" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=https%3A%2F%2Finternetbooty.com%2F%3Futm_source%3Dreddit%26utm_medium%3Dorganic%26utm_campaign%3Dfirst_vault&title=I%20found%20a%20%245%2C000%20online%20treasure%20hunt%20with%20a%20hidden%20early-access%20path">Share on Reddit</a>
+          <button class="share-link share-copy" type="button" id="copyVault">Copy link</button>
         </div>
       </div>
     </section>
