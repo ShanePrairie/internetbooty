@@ -11,7 +11,7 @@ import urllib.request
 from datetime import datetime, timezone
 from functools import wraps
 
-from flask import Flask, abort, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, session, url_for
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 app = Flask(__name__)
@@ -412,6 +412,33 @@ def inject_globals():
 @app.get("/")
 def home():
     return render_template("index.html", locked=request.args.get("locked") == "1")
+
+
+@app.get("/robots.txt")
+def robots():
+    return Response(
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /crew/\n"
+        "Disallow: /api/\n"
+        "Disallow: /webhooks/\n"
+        "Sitemap: https://internetbooty.com/sitemap.xml\n",
+        mimetype="text/plain",
+    )
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    return Response(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        "  <url>\n"
+        "    <loc>https://internetbooty.com/</loc>\n"
+        "    <lastmod>2026-09-24</lastmod>\n"
+        "  </url>\n"
+        "</urlset>\n",
+        mimetype="application/xml",
+    )
 
 
 @app.route("/captains-mark", methods=["GET", "POST"])
