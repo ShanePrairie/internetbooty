@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Crew Sign In — Internet Booty</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="secret-page">
+  <div class="noise" aria-hidden="true"></div>
+  <main class="crew-wrap shell">
+    <a class="brand crew-brand" href="/">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>Internet Booty</span>
+    </a>
+
+    <section class="crew-card signin-card">
+      <div class="crew-rune">✉</div>
+      <p class="section-kicker">CREW SIGN IN</p>
+      <h1>Return to the ship.</h1>
+      <p class="register-intro">Enter the email used for your Early Crew account. We'll send a secure sign-in link.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" class="register-form">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label>
+          <span>Email address</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </label>
+        <button class="primary secret-submit" type="submit">SEND SIGN-IN LINK →</button>
+      </form>
+
+      <p class="signin-nudge"><a href="{{ url_for('early_access') }}">← Back to Early Crew access</a></p>
+    </section>
+  </main>
+</body>
+</html>
