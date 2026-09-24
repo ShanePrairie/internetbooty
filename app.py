@@ -686,7 +686,7 @@ def verify_square_configuration():
             locations = data.get("locations") or []
             active = [loc for loc in locations if loc.get("status") == "ACTIVE"]
             if active:
-                app.logger.info("Square startup check: authenticated successfully; active location available")
+                app.logger.warning("Square startup check: authenticated successfully; active location available")
             else:
                 app.logger.warning("Square startup check: authenticated, but no active location is available")
         else:
