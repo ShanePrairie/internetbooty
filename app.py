@@ -47,6 +47,110 @@ SQUARE_WEBHOOK_NOTIFICATION_URL = os.getenv(
     "https://internetbooty.onrender.com/webhooks/square",
 )
 
+GUIDES = {
+    "how-online-treasure-hunts-work": {
+        "title": "How Online Treasure Hunts Work",
+        "description": "A practical guide to online treasure hunts, puzzle paths, ciphers, clue chains, and what makes a fair digital hunt.",
+        "eyebrow": "FIELD NOTES 01",
+        "heading": "How online treasure hunts actually work.",
+        "intro": "Online treasure hunts turn the internet into a puzzle board. Instead of following a physical map, players move through clues, documents, symbols, ciphers, websites, and research until one final answer emerges.",
+        "sections": [
+            {
+                "title": "A trail, not a trivia quiz",
+                "body": "The strongest hunts are built as chains. One solved clue reveals the next place to look, the next decoding method, or the next piece of context. That structure matters because it rewards observation and reasoning rather than random guessing. A clue might begin as a line of text, point toward a public source, hide a pattern in a page, and eventually produce a word or phrase that unlocks the next stage. Good hunts also give every player the same underlying path, even when different solvers reach the answer in different ways."
+            },
+            {
+                "title": "Common building blocks",
+                "body": "Puzzle hunts often mix several forms of reasoning: substitution ciphers, acrostics, wordplay, coordinates, book ciphers, metadata, visual patterns, number systems, and research clues. The challenge is rarely knowing every technique in advance. It is noticing what kind of problem you are looking at. Repetition may suggest a cipher. Strange capitalization may suggest hidden text. A suspicious quotation may point to a source. The skill is learning to recognize signals without forcing every clue into the same method."
+            },
+            {
+                "title": "Fairness matters",
+                "body": "A well-designed online hunt should not require privileged access, secret personal relationships, or information available only to one player. The puzzle itself should contain enough structure to lead a careful solver forward. Timing also matters. If a hunt is competitive, launch times, answer submission, and winner verification need to be handled consistently so the competition is based on solving rather than technical quirks."
+            },
+            {
+                "title": "The First Vault",
+                "body": "Internet Booty is built around that style of hunt: layered clues, ciphers, hidden patterns, and a final solution. The First Vault is scheduled to open after the public countdown. Until then, the homepage is intentionally part atmosphere and part puzzle. People who pay close attention may notice that not every path announces itself."
+            }
+        ]
+    },
+    "puzzle-hunt-strategy": {
+        "title": "Puzzle Hunt Strategy: Solve Layered Riddles Faster",
+        "description": "A practical puzzle-hunt strategy guide covering clue triage, pattern recognition, note-taking, dead ends, and verification.",
+        "eyebrow": "FIELD NOTES 02",
+        "heading": "A better way to attack a puzzle hunt.",
+        "intro": "Speed in a puzzle hunt is usually less about knowing obscure facts and more about staying organized, testing ideas cheaply, and abandoning bad assumptions before they consume an hour.",
+        "sections": [
+            {
+                "title": "Start by inventorying the clue",
+                "body": "Before decoding anything, list what is unusual. Count lines, words, letters, repeated symbols, capitalization, punctuation, spacing, dates, numbers, and source references. Many puzzles become harder because solvers begin transforming the clue before understanding what makes it distinctive. A thirty-second inventory gives you a baseline and keeps you from overlooking the most deliberate feature."
+            },
+            {
+                "title": "Test cheap hypotheses first",
+                "body": "Try methods in increasing order of cost. Acrostics, first letters, last letters, obvious Caesar shifts, simple indexing, and direct references are quick to test. Complex ciphers, broad web research, or brute force should come later unless the clue strongly points there. This approach protects your time and makes false starts easier to discard."
+            },
+            {
+                "title": "Keep a solve log",
+                "body": "Write down what you tried, what output you got, and why you rejected it. Puzzle hunts often reuse information from earlier steps, and a failed idea can become useful after a later clue changes the context. A solve log also prevents teams from repeating the same dead end. Screenshots, copied text, timestamps, and short notes are enough."
+            },
+            {
+                "title": "Demand confirmation",
+                "body": "A good solve usually confirms itself. The output should look intentional, connect naturally to the next clue, or explain why a strange feature existed. If a method produces gibberish that requires several extra assumptions, treat it as weak evidence. The best competitive habit is not solving fast; it is recognizing when you have actually solved something."
+            }
+        ]
+    },
+    "cipher-solving-basics": {
+        "title": "Cipher Solving Basics for Online Puzzle Hunts",
+        "description": "Learn the most useful beginner cipher techniques for online puzzle hunts, including Caesar shifts, substitution, indexing, and transposition.",
+        "eyebrow": "FIELD NOTES 03",
+        "heading": "Cipher basics every treasure hunter should know.",
+        "intro": "You do not need to memorize hundreds of historical ciphers to be dangerous in a puzzle hunt. A small toolkit covers a surprising amount of territory.",
+        "sections": [
+            {
+                "title": "Caesar and ROT shifts",
+                "body": "A Caesar cipher moves every letter by the same number of positions in the alphabet. ROT13 is the familiar version that shifts by thirteen. If text looks almost language-like or a clue contains a strong number, a shift is cheap to test. Watch for wraparound from Z back to A, and remember that the number may come from somewhere else in the puzzle rather than being stated directly."
+            },
+            {
+                "title": "Substitution ciphers",
+                "body": "In a simple substitution cipher, each plaintext letter is consistently replaced by another symbol or letter. Frequency helps: E is common in English, one-letter words are often A or I, and repeated letter patterns preserve repeated structures. In puzzle hunts, however, the key is frequently hinted by the clue, so do not assume you must solve every substitution from frequency alone."
+            },
+            {
+                "title": "Indexing",
+                "body": "Indexing is one of the most common puzzle-hunt mechanisms. A sequence of numbers may tell you which letter to take from each word or line. For example, a 3 beside a word can mean take its third letter. Always check whether the clue suggests one-based indexing, zero-based indexing, line numbers, word numbers, or letter positions."
+            },
+            {
+                "title": "Transposition and ordering",
+                "body": "Sometimes the letters are correct but arranged in the wrong order. Columns may need to be read vertically, rows reversed, chunks reordered, or text placed into a grid. If the clue's character count factors neatly into a rectangle, or the formatting looks unnaturally regular, test a transposition before reaching for a more exotic cipher."
+            }
+        ]
+    },
+    "what-makes-a-great-online-treasure-hunt": {
+        "title": "What Makes a Great Online Treasure Hunt?",
+        "description": "The design principles behind memorable online treasure hunts: discovery, fairness, escalating puzzles, atmosphere, and a satisfying finish.",
+        "eyebrow": "FIELD NOTES 04",
+        "heading": "What separates a hunt from a pile of riddles?",
+        "intro": "A memorable treasure hunt creates the feeling that the player is discovering a hidden system. The puzzles matter, but pacing, atmosphere, and trust are what make people keep searching.",
+        "sections": [
+            {
+                "title": "Discovery before explanation",
+                "body": "Treasure hunts are strongest when the player notices something before the site tells them what it means. A strange mark, an odd sentence, a repeated symbol, or a page that feels slightly too deliberate can create the first spark. That moment turns browsing into investigation. The trick is making hidden details discoverable enough that attentive people can find them without making the answer obvious."
+            },
+            {
+                "title": "Escalation",
+                "body": "Early puzzles should teach the language of the hunt. Later puzzles can combine techniques, require research, or connect information that originally seemed unrelated. This creates a sense of progression. Difficulty should rise because the player has learned more, not because the clues become arbitrary."
+            },
+            {
+                "title": "Atmosphere with purpose",
+                "body": "Visual design, story, sound, and writing can make a puzzle feel larger than the mechanism underneath it. The best atmosphere also carries information. Decorative details may hint at a theme, suggest a method, or reinforce the world of the hunt. When every element feels potentially meaningful, players naturally become more observant."
+            },
+            {
+                "title": "A finish that feels earned",
+                "body": "The final solve should connect to what came before. A satisfying ending gives players the sense that the path was visible in retrospect, even if it was difficult in the moment. That is the standard behind The First Vault: a trail built to reward attention, persistence, and reasoning rather than pure guessing."
+            }
+        ]
+    }
+}
+
+
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_-]{3,24}$")
 
@@ -409,6 +513,14 @@ def inject_globals():
     }
 
 
+@app.get("/guides/<slug>")
+def guide(slug):
+    item = GUIDES.get(slug)
+    if not item:
+        abort(404)
+    return render_template("guide.html", guide=item, slug=slug)
+
+
 @app.get("/")
 def home():
     return render_template("index.html", locked=request.args.get("locked") == "1")
@@ -718,7 +830,16 @@ def sitemap():
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-</urlset>
+""" + "".join(
+        f"""  <url>
+    <loc>https://internetbooty.com/guides/{slug}</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+"""
+        for slug in GUIDES
+    ) + """</urlset>
 """
     return Response(body, mimetype="application/xml")
 
