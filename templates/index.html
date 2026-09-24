@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06131b">
+  <meta name="description" content="A global online treasure hunt. Solve the final clue first and claim the $5,000 grand prize.">
+  <link rel="canonical" href="https://internetbooty.com/">
+  <meta property="og:title" content="Internet Booty presents The First Vault — $5,000 Online Treasure Hunt">
+  <meta property="og:description" content="The vault opens soon. One final clue. One first solver. A $5,000 grand prize.">
+  <meta property="og:url" content="https://internetbooty.com/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>{{ site_name }} — The First Vault {{ prize_amount }} Treasure Hunt</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="prelaunch{% if locked %} was-locked{% endif %}">
+  <div class="noise" aria-hidden="true"></div>
+  <div id="stars" class="stars" aria-hidden="true"></div>
+
+  <div class="announcement">
+    <span class="flare">✦</span>
+    <span>THE VAULT OPENS SOON</span>
+    <span class="dot">•</span>
+    <span>{{ prize_amount }} GRAND PRIZE</span>
+    <span class="flare">✦</span>
+  </div>
+
+  <header class="site-header shell">
+    <a class="brand" href="/" aria-label="Internet Booty home">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>{{ site_name }}</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#story">The Hunt</a>
+      <a href="#prize">Prize</a>
+      <a href="#locked">Locked</a>
+    </nav>
+    <a class="header-cta" href="#countdown">Await the Signal</a>
+  </header>
+
+  <main>
+    <section class="hero shell" id="countdown">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> A PUZZLE HUNT FOR THE CURIOUS <span></span></p>
+        <h1><small>THE</small> FIRST<br>VAULT</h1>
+        <p class="hero-tagline">Real clues. A hidden path. <strong>{{ prize_amount }}.</strong></p>
+        <p class="lede">When the timer reaches zero, the hunt begins. Follow the trail, break the ciphers, and uncover the final clue. <strong>The first eligible solver to submit the correct final answer wins the {{ prize_amount }} grand prize.</strong></p>
+
+        <div class="countdown-frame" aria-label="Countdown to the hunt">
+          <div class="countdown-label">THE HUNT BEGINS IN</div>
+          <div class="countdown" data-launch="{{ launch_at }}">
+            <div><b id="days">20</b><span>Days</span></div>
+            <i></i>
+            <div><b id="hours">00</b><span>Hours</span></div>
+            <i></i>
+            <div><b id="minutes">00</b><span>Minutes</span></div>
+            <i></i>
+            <div><b id="seconds">00</b><span>Seconds</span></div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="primary" type="button" id="signalButton"><span>⚔</span> THE GATE IS SEALED</button>
+          <a class="secondary" href="#story">Discover the legend ↓</a>
+        </div>
+        <p class="microcopy">All protected hunt pages remain server-locked until the countdown ends.</p>
+      </div>
+
+      <div class="hero-art" aria-label="A chained pirate vault glowing in moonlight">
+        <div class="moon"></div>
+        <div class="vault-card">
+          <img src="{{ url_for('static', filename='img/vault.webp') }}" alt="A chained ancient vault glowing with golden light">
+          <div class="vault-glow"></div>
+          <div class="sigil sigil-one">Ⅷ</div>
+          <div class="sigil sigil-two">☼</div>
+        </div>
+        <p class="whisper">“Some secrets are worth the wait.”</p>
+      </div>
+    </section>
+
+    <section class="manifesto" id="story">
+      <div class="shell story-grid">
+        <div class="story-number">01</div>
+        <div>
+          <p class="section-kicker">THE LEGEND BEGINS</p>
+          <h2>Not all treasure is buried.</h2>
+          <p>This one lives in words, symbols, forgotten pages, hidden patterns, and the things most people pass without noticing. Every entrant receives the same hunt. Every clue has an intended path. The finish belongs to whoever sees it first.</p>
+        </div>
+        <div class="seal"><span>FIRST<br>VAULT</span></div>
+      </div>
+    </section>
+
+    <section class="locked-section shell" id="locked">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">BEYOND THE GATE</p>
+          <h2>Four doors. All sealed.</h2>
+        </div>
+        <p>What lies behind them will not be exposed early—not by a hidden URL, not by page source, and not by guessing a route.</p>
+      </div>
+
+      <div class="locked-grid">
+        <a class="locked-card" href="/hunt">
+          <span class="card-index">I</span><span class="lock">⌾</span>
+          <h3>The Clues</h3><b>LOCKED</b>
+          <p>A trail of layered riddles, ciphers, and discoveries.</p>
+        </a>
+        <a class="locked-card" href="/map">
+          <span class="card-index">II</span><span class="lock">⌾</span>
+          <h3>The Map</h3><b>LOCKED</b>
+          <p>Fragments, coordinates, and paths that reveal themselves slowly.</p>
+        </a>
+        <a class="locked-card" href="/puzzles">
+          <span class="card-index">III</span><span class="lock">⌾</span>
+          <h3>Puzzle Rooms</h3><b>LOCKED</b>
+          <p>Deeper locks. Stranger rules. Higher stakes.</p>
+        </a>
+        <a class="locked-card" href="/archive">
+          <span class="card-index">IV</span><span class="lock">⌾</span>
+          <h3>The Archive</h3><b>LOCKED</b>
+          <p>Documents, lore, and pieces of the story still sleeping.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="prize" id="prize">
+      <div class="shell prize-grid">
+        <div>
+          <p class="section-kicker">THE PRIZE</p>
+          <h2>One final clue.<br><em>One first solver.</em></h2>
+          <p>The hunt ends the moment the correct final solution is received and verified. The grand prize is <strong>{{ prize_amount }}</strong>.</p>
+        </div>
+        <div class="coin" aria-hidden="true">
+          <span class="coin-inner">$5K</span>
+        </div>
+        <div class="prize-facts">
+          <div><span>⚓</span><b>GLOBAL</b><small>Online hunt</small></div>
+          <div><span>⌖</span><b>SKILL</b><small>Clues & ciphers</small></div>
+          <div><span>♛</span><b>{{ prize_amount }}</b><small>Grand prize</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-call shell">
+      <div class="compass" aria-hidden="true">✥</div>
+      <p>THE SEA IS QUIET FOR NOW.</p>
+      <h2>In twenty days, the first mark appears.</h2>
+      <a href="#countdown">Return to the countdown ↑</a>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <span>© 2026 {{ site_name }}</span>
+    <span>Built for the curious.</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-lock">⌾</span>
+    <div><b>The gate is still sealed.</b><small>The hunt opens when the countdown reaches zero.</small></div>
+  </div>
+
+  <script>window.FIRST_VAULT = { launchAt: {{ launch_at|tojson }}, huntOpen: {{ hunt_open|tojson }} };</script>
+  <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+</body>
+</html>
