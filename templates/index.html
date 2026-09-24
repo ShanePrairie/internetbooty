@@ -71,10 +71,17 @@
       <div class="hero-art" aria-label="A chained pirate vault glowing in moonlight">
         <div class="moon"></div>
         <div class="vault-card">
-          <img src="{{ url_for('static', filename='img/vault.jpg') }}" alt="A chained ancient vault glowing with golden light">
+          <img
+            src="https://images.unsplash.com/photo-1777652062282-9b2985cd28d9?auto=format&fit=crop&w=1600&q=90"
+            srcset="https://images.unsplash.com/photo-1777652062282-9b2985cd28d9?auto=format&fit=crop&w=900&q=88 900w, https://images.unsplash.com/photo-1777652062282-9b2985cd28d9?auto=format&fit=crop&w=1600&q=90 1600w"
+            sizes="(max-width: 900px) 86vw, 420px"
+            alt="A gleaming golden vault door standing open"
+            fetchpriority="high"
+            decoding="async">
           <div class="vault-glow"></div>
           <div class="sigil sigil-one">Ⅷ</div>
           <div class="sigil sigil-two">☼</div>
+          <a class="easter-mark" href="{{ url_for('early_access') }}" aria-label="A curious mark">✦</a>
         </div>
         <p class="whisper">“Some secrets are worth the wait.”</p>
       </div>
@@ -153,7 +160,7 @@
 
   <footer class="site-footer shell">
     <span>© 2026 {{ site_name }}</span>
-    <span>Built for the curious.</span>
+    <span>Built for the curious. Vault photo: Lu / Unsplash.</span>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite">
