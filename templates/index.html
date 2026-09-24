@@ -17,7 +17,7 @@
   <meta name="twitter:title" content="Internet Booty — The First Vault">
   <meta name="twitter:description" content="A hidden path. A $5,000 grand prize. The vault opens soon.">
   <meta name="twitter:image" content="https://images.stockcake.com/public/f/9/4/f94399c3-2270-4c9f-ba44-1e15b9c18a00_large/vault-door-treasure-stockcake.jpg">
-  <script type="application/ld+json">
+  <script nonce="{{ csp_nonce }}" type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -247,7 +247,7 @@
     <div><b>The gate is still sealed.</b><small>The hunt opens when the countdown reaches zero.</small></div>
   </div>
 
-  <script>window.FIRST_VAULT = { launchAt: {{ launch_at|tojson }}, huntOpen: {{ hunt_open|tojson }} };</script>
-  <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+  <script nonce="{{ csp_nonce }}">window.FIRST_VAULT = { launchAt: {{ launch_at|tojson }}, huntOpen: {{ hunt_open|tojson }} };</script>
+  <script nonce="{{ csp_nonce }}" src="{{ url_for('static', filename='js/site.js') }}"></script>
 </body>
 </html>
