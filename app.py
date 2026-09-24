@@ -251,7 +251,7 @@ def crew_signin():
             try:
                 contact = get_contact(email)
                 access = (contact or {}).get("properties", {}).get("internetbooty_access")
-                if contact and access:
+                if contact and access == "early_10_reserved":
                     send_login_link(email)
                 # Always show the same response to avoid revealing registered emails.
                 flash("If that address is aboard, a sign-in link is on its way.", "success")
