@@ -694,6 +694,35 @@ def status():
     })
 
 
+@app.get("/robots.txt")
+def robots():
+    return Response(
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /crew/\n"
+        "Disallow: /captains-mark\n"
+        "Disallow: /webhooks/\n"
+        "Sitemap: https://internetbooty.com/sitemap.xml\n",
+        mimetype="text/plain",
+    )
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    lastmod = datetime.now(timezone.utc).date().isoformat()
+    body = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://internetbooty.com/</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+"""
+    return Response(body, mimetype="application/xml")
+
+
 @app.get("/health")
 def health():
     return {
