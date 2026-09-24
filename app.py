@@ -676,6 +676,28 @@ def health():
     }, 200
 
 
+def verify_square_configuration():
+    if not SQUARE_ACCESS_TOKEN:
+        app.logger.warning("Square startup check: access token is not configured")
+        return
+    try:
+        status, data = square_request("GET", "/v2/locations")
+        if status == 200:
+            locations = data.get("locations") or []
+            active = [loc for loc in locations if loc.get("status") == "ACTIVE"]
+            if active:
+                app.logger.info("Square startup check: authenticated successfully; active location available")
+            else:
+                app.logger.warning("Square startup check: authenticated, but no active location is available")
+        else:
+            app.logger.error("Square startup check failed: HTTP %s (%s)", status, square_error_message(data))
+    except Exception as exc:
+        app.logger.error("Square startup check failed: %s", exc)
+
+
+verify_square_configuration()
+
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=os.getenv("FLASK_DEBUG") == "1")
