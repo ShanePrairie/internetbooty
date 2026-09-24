@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: internetbooty
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
+      - key: SITE_NAME
+        value: Internet Booty
+      - key: PRIZE_AMOUNT
+        value: $5,000
+      - key: LAUNCH_AT
+        value: 2026-10-14T18:24:00+00:00
