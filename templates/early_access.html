@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#061018">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Early Crew Access — Internet Booty</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="secret-page">
+  <div class="noise" aria-hidden="true"></div>
+  <div class="secret-stars"></div>
+
+  <header class="secret-header shell">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>Internet Booty</span>
+    </a>
+    <span class="secret-status">YOU FOUND THE MARK</span>
+  </header>
+
+  <main class="secret-shell shell">
+    <section class="secret-copy">
+      <p class="eyebrow"><span></span> NOT EVERYONE WILL FIND THIS <span></span></p>
+      <h1>Early Crew<br><em>Access.</em></h1>
+      <p class="secret-lede">There are doors on this site that do not announce themselves. You found one.</p>
+      <p class="secret-body">Create an Early Crew account now and your entry rate for <strong>The First Vault</strong> is reserved at <strong>$10</strong> instead of the regular <strong>$20</strong>.</p>
+
+      <div class="price-lockup">
+        <div class="price-old">
+          <small>REGULAR ENTRY</small>
+          <span>$20</span>
+        </div>
+        <div class="price-slash">→</div>
+        <div class="price-new">
+          <small>EARLY CREW</small>
+          <span>$10</span>
+        </div>
+      </div>
+
+      <div class="secret-note">
+        <span>✦</span>
+        <p>Your $10 rate is reserved when your account is created. Payment is not collected on this page yet.</p>
+      </div>
+    </section>
+
+    <section class="register-card">
+      <div class="register-emblem">☠</div>
+      <p class="section-kicker">CAPTAIN'S MARK</p>
+      <h2>Join the Early Crew.</h2>
+      <p class="register-intro">Your email becomes your account identity. Pick a pirate name, and we'll keep your $10 early-entry rate attached to it.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" class="register-form" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <div class="honey" aria-hidden="true">
+          <label>Website <input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <label>
+          <span>Email address</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </label>
+
+        <label>
+          <span>Pirate name</span>
+          <input type="text" name="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_-]{3,24}" autocomplete="nickname" placeholder="BlackCompass">
+          <small>3–24 characters. Letters, numbers, underscores, or dashes.</small>
+        </label>
+
+        <label class="consent-row">
+          <input type="checkbox" name="consent" value="yes" required>
+          <span>Join the Internet Booty Early Crew email list for launch announcements, hunt updates, and account messages. You can unsubscribe from marketing emails later.</span>
+        </label>
+
+        <button class="primary secret-submit" type="submit">CREATE ACCOUNT & RESERVE $10 RATE →</button>
+      </form>
+
+      <p class="signin-nudge">Already aboard? <a href="{{ url_for('crew_signin') }}">Sign in by email.</a></p>
+      <p class="fineprint">Finding this page does not reveal or unlock any hunt clues.</p>
+    </section>
+  </main>
+</body>
+</html>
