@@ -15,7 +15,7 @@
   <title>{{ guide.title }} — Internet Booty</title>
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
-  <script type="application/ld+json">
+  <script nonce="{{ csp_nonce }}" type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
