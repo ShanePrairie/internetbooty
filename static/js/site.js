@@ -38,4 +38,29 @@
     clearTimeout(window.__vaultToast);
     window.__vaultToast=setTimeout(()=>toast.classList.remove('show'),3800);
   });
+  const shareVault = document.getElementById('shareVault');
+  const copyVault = document.getElementById('copyVault');
+  const shareUrl = 'https://internetbooty.com/?utm_source=share&utm_medium=organic&utm_campaign=first_vault';
+  const shareText = "I found a $5,000 online treasure hunt called Internet Booty. There's a hidden early-access path somewhere on the homepage.";
+
+  if (shareVault) shareVault.addEventListener('click', async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({title:'Internet Booty — The First Vault', text:shareText, url:shareUrl});
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        shareVault.textContent = 'LINK COPIED ✓';
+        setTimeout(()=>shareVault.textContent='SHARE THE VAULT →',1800);
+      }
+    } catch (_) {}
+  });
+
+  if (copyVault) copyVault.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      copyVault.textContent = 'COPIED ✓';
+      setTimeout(()=>copyVault.textContent='COPY LINK',1800);
+    } catch (_) {}
+  });
+
 })();
