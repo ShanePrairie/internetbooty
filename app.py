@@ -676,27 +676,6 @@ def health():
     }, 200
 
 
-def verify_square_configuration():
-    if not SQUARE_ACCESS_TOKEN:
-        print("SQUARE_CHECK access_token_missing", flush=True)
-        return
-    try:
-        status, data = square_request("GET", "/v2/locations")
-        if status == 200:
-            locations = data.get("locations") or []
-            active = [loc for loc in locations if loc.get("status") == "ACTIVE"]
-            if active:
-                print("SQUARE_CHECK authenticated active_location", flush=True)
-            else:
-                print("SQUARE_CHECK authenticated no_active_location", flush=True)
-        else:
-            print(f"SQUARE_CHECK failed_http_{status} {square_error_message(data)}", flush=True)
-    except Exception as exc:
-        print(f"SQUARE_CHECK exception {exc}", flush=True)
-
-
-verify_square_configuration()
-
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
