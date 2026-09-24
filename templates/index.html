@@ -164,6 +164,39 @@
       </div>
     </section>
 
+    <section class="launch-watch" id="launch-watch">
+      <div class="shell launch-watch-grid">
+        <div>
+          <p class="section-kicker">GET THE SIGNAL</p>
+          <h2>Don't miss the moment the vault moves.</h2>
+          <p>Join the free launch watch. We'll email you when The First Vault opens and when major hunt updates drop.</p>
+        </div>
+        <div class="launch-watch-form-wrap">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-stack">
+                {% for category, message in messages %}
+                  <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+          <form method="post" action="{{ url_for('launch_watch') }}" class="launch-watch-form">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <div class="honey" aria-hidden="true">
+              <label>Website <input name="website" tabindex="-1" autocomplete="off"></label>
+            </div>
+            <label for="watch-email">Email address</label>
+            <div class="launch-watch-row">
+              <input id="watch-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+              <button class="primary" type="submit">GET THE SIGNAL →</button>
+            </div>
+            <small>Free updates only. Unsubscribe anytime. The hidden Early Crew path remains hidden.</small>
+          </form>
+        </div>
+      </div>
+    </section>
+
     <section class="field-notes shell">
       <div class="section-head">
         <div>
