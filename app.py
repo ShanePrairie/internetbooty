@@ -5,13 +5,14 @@ import json
 import os
 import re
 import secrets
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 
-from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, abort, flash, g, jsonify, redirect, render_template, request, session, url_for
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 app = Flask(__name__)
@@ -25,11 +26,26 @@ REGULAR_PRICE = 20
 EARLY_PRICE_CENTS = int(os.getenv("EARLY_PRICE_CENTS", "1000"))
 REGULAR_PRICE_CENTS = int(os.getenv("REGULAR_PRICE_CENTS", "2000"))
 
-app.secret_key = os.getenv("SECRET_KEY", secrets.token_urlsafe(48))
+IS_DEBUG = os.getenv("FLASK_DEBUG") == "1"
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if not SECRET_KEY and not IS_DEBUG:
+    raise RuntimeError("SECRET_KEY must be configured in production.")
+
+app.secret_key = SECRET_KEY or secrets.token_urlsafe(48)
+PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://internetbooty.onrender.com").rstrip("/")
+trusted_hosts = ["internetbooty.com", "www.internetbooty.com", "internetbooty.onrender.com"]
+if IS_DEBUG:
+    trusted_hosts.extend(["localhost", "127.0.0.1"])
+
 app.config.update(
+    SESSION_COOKIE_NAME="__Host-internetbooty",
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=os.getenv("FLASK_DEBUG") != "1",
+    SESSION_COOKIE_SECURE=not IS_DEBUG,
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
+    SESSION_REFRESH_EACH_REQUEST=False,
+    MAX_CONTENT_LENGTH=64 * 1024,
+    TRUSTED_HOSTS=trusted_hosts,
 )
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
@@ -152,6 +168,82 @@ GUIDES = {
 }
 
 
+SENSITIVE_PATH_PREFIXES = (
+    "/crew",
+    "/captains-mark",
+    "/hunt",
+    "/map",
+    "/puzzles",
+    "/archive",
+)
+RATE_BUCKETS = {}
+
+
+def client_fingerprint():
+    forwarded = request.headers.get("CF-Connecting-IP") or request.headers.get("X-Forwarded-For", "")
+    ip = forwarded.split(",", 1)[0].strip() if forwarded else (request.remote_addr or "unknown")
+    return hashlib.sha256(ip.encode("utf-8")).hexdigest()[:24]
+
+
+def enforce_rate_limit(scope, limit, window_seconds, subject=""):
+    now = time.monotonic()
+    key = f"{scope}:{client_fingerprint()}:{subject}"
+    bucket = RATE_BUCKETS.setdefault(key, [])
+    cutoff = now - window_seconds
+    bucket[:] = [stamp for stamp in bucket if stamp > cutoff]
+    if len(bucket) >= limit:
+        abort(429)
+    bucket.append(now)
+
+    if len(RATE_BUCKETS) > 5000:
+        stale_before = now - 3600
+        for old_key in list(RATE_BUCKETS):
+            RATE_BUCKETS[old_key] = [stamp for stamp in RATE_BUCKETS[old_key] if stamp > stale_before]
+            if not RATE_BUCKETS[old_key]:
+                RATE_BUCKETS.pop(old_key, None)
+
+
+def public_url(path):
+    return f"{PUBLIC_BASE_URL}{path}"
+
+
+@app.before_request
+def prepare_security_context():
+    g.csp_nonce = secrets.token_urlsafe(18)
+
+
+@app.after_request
+def apply_security_headers(response):
+    nonce = getattr(g, "csp_nonce", "")
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https://images.stockcake.com https://www.google-analytics.com https://www.googletagmanager.com; "
+        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; "
+        "font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; "
+        "form-action 'self'; upgrade-insecure-requests"
+    )
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "same-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+
+    host = (request.host or "").split(":", 1)[0].lower()
+    if host in {"internetbooty.com", "www.internetbooty.com"}:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000"
+
+    if request.path.startswith(SENSITIVE_PATH_PREFIXES):
+        response.headers["Cache-Control"] = "no-store, private, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive, nosnippet"
+
+    return response
+
+
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_-]{3,24}$")
 
@@ -168,11 +260,66 @@ def hunt_is_open():
     return datetime.now(timezone.utc) >= launch_datetime()
 
 
+def clear_auth_session():
+    for key in (
+        "crew_email",
+        "crew_username",
+        "crew_amount_paid",
+        "early_registered",
+        "auth_at",
+        "paid_verified_at",
+    ):
+        session.pop(key, None)
+
+
+def paid_session_valid(max_verification_age=300):
+    email = session.get("crew_email")
+    auth_at = session.get("auth_at")
+    if not email or not auth_at:
+        return False
+
+    now = int(time.time())
+    if now - int(auth_at) > 12 * 3600:
+        clear_auth_session()
+        return False
+
+    last_verified = int(session.get("paid_verified_at") or 0)
+    if now - last_verified <= max_verification_age:
+        return True
+
+    try:
+        contact = get_contact(email)
+    except Exception:
+        app.logger.exception("Paid entitlement revalidation failed")
+        return False
+
+    if not contact_is_paid(contact):
+        clear_auth_session()
+        return False
+
+    props = contact.get("properties") or {}
+    session["crew_username"] = props.get("username") or session.get("crew_username") or "Crewmate"
+    session["paid_verified_at"] = now
+    return True
+
+
 def hunt_gate(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not hunt_is_open():
             return redirect(url_for("home", locked="1"), code=302)
+        if not paid_session_valid():
+            flash("Paid crew access is required to enter the hunt.", "error")
+            return redirect(url_for("crew_signin"), code=302)
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def crew_gate(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not paid_session_valid():
+            return redirect(url_for("crew_signin"), code=302)
         return view(*args, **kwargs)
     return wrapped
 
@@ -340,15 +487,20 @@ def activate_contact(email, username, payment_id, amount_cents, paid_at):
 
 
 def login_crew(email, username, amount_cents=EARLY_PRICE_CENTS):
+    session.clear()
+    session.permanent = True
     session["crew_email"] = email
     session["crew_username"] = username
     session["crew_amount_paid"] = int(amount_cents) / 100
     session["early_registered"] = int(amount_cents) == EARLY_PRICE_CENTS
+    session["auth_at"] = int(time.time())
+    session["paid_verified_at"] = int(time.time())
+    csrf_token()
 
 
 def send_welcome_email(email, username, amount_cents):
     amount = int(amount_cents) / 100
-    link = url_for("crew_signin", _external=True, _scheme="https")
+    link = public_url(url_for("crew_signin"))
     html = f"""
     <div style="font-family:Georgia,serif;background:#061018;color:#f5ecd8;padding:34px">
       <div style="max-width:560px;margin:auto;border:1px solid #b98c3a;padding:30px;background:#091821">
@@ -373,9 +525,19 @@ def send_welcome_email(email, username, amount_cents):
 
 
 def send_login_link(email):
+    nonce = secrets.token_urlsafe(24)
+    encoded = urllib.parse.quote(email, safe="")
+    status, data = resend_request(
+        "PATCH",
+        f"/contacts/{encoded}",
+        {"properties": {"login_nonce": nonce}},
+    )
+    if status not in (200, 201):
+        raise RuntimeError(data.get("message", "Unable to prepare sign-in link."))
+
     serializer = URLSafeTimedSerializer(app.secret_key)
-    token = serializer.dumps(email, salt="crew-login")
-    link = url_for("crew_magic", token=token, _external=True, _scheme="https")
+    token = serializer.dumps({"email": email, "nonce": nonce}, salt="crew-login")
+    link = public_url(url_for("crew_magic", token=token))
     html = f"""
     <div style="font-family:Georgia,serif;background:#061018;color:#f5ecd8;padding:34px">
       <div style="max-width:560px;margin:auto;border:1px solid #b98c3a;padding:30px;background:#091821">
@@ -453,7 +615,7 @@ def square_location_id():
 def create_square_checkout(email, username, amount_cents):
     token = make_registration_token(email, username, amount_cents)
     location_id = square_location_id()
-    return_url = url_for("square_return", _external=True, _scheme="https")
+    return_url = public_url(url_for("square_return"))
     redirect_url = f"{return_url}?token={urllib.parse.quote(token, safe='')}"
 
     payload = {
@@ -548,6 +710,7 @@ def inject_globals():
         "csrf_token": csrf_token,
         "early_price": EARLY_PRICE,
         "regular_price": REGULAR_PRICE,
+        "csp_nonce": getattr(g, "csp_nonce", ""),
     }
 
 
@@ -566,6 +729,7 @@ def home():
 
 @app.post("/launch-watch")
 def launch_watch():
+    enforce_rate_limit("launch-watch", 6, 3600)
     if not valid_csrf():
         abort(400)
     if request.form.get("website"):
@@ -593,6 +757,10 @@ def robots():
         "Disallow: /crew/\n"
         "Disallow: /captains-mark\n"
         "Disallow: /api/\n"
+        "Disallow: /hunt\n"
+        "Disallow: /map\n"
+        "Disallow: /puzzles\n"
+        "Disallow: /archive\n"
         "Disallow: /webhooks/\n"
         "Sitemap: https://internetbooty.com/sitemap.xml\n",
         mimetype="text/plain",
@@ -626,6 +794,7 @@ def sitemap():
 @app.route("/captains-mark", methods=["GET", "POST"])
 def early_access():
     if request.method == "POST":
+        enforce_rate_limit("early-checkout-ip", 8, 600)
         if not valid_csrf():
             abort(400)
 
@@ -633,6 +802,7 @@ def early_access():
             return redirect(url_for("early_access"))
 
         email = request.form.get("email", "").strip().lower()
+        enforce_rate_limit("early-checkout-email", 4, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
         username = request.form.get("username", "").strip()
         consent = request.form.get("consent") == "yes"
 
@@ -704,6 +874,7 @@ def square_return():
 
 @app.get("/crew/payment-status")
 def square_payment_status():
+    enforce_rate_limit("payment-status", 45, 60)
     token = request.args.get("token", "")
     if not token:
         return jsonify({"paid": False}), 400
@@ -777,10 +948,9 @@ def square_webhook():
 
 
 @app.get("/crew")
+@crew_gate
 def crew_account():
     email = session.get("crew_email")
-    if not email:
-        return redirect(url_for("crew_signin"))
     username = session.get("crew_username", "Crewmate")
     amount_paid = session.get("crew_amount_paid", EARLY_PRICE)
     return render_template("crew.html", email=email, username=username, amount_paid=amount_paid)
@@ -789,9 +959,11 @@ def crew_account():
 @app.route("/crew/sign-in", methods=["GET", "POST"])
 def crew_signin():
     if request.method == "POST":
+        enforce_rate_limit("crew-signin-ip", 6, 600)
         if not valid_csrf():
             abort(400)
         email = request.form.get("email", "").strip().lower()
+        enforce_rate_limit("crew-signin-email", 3, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
         if not EMAIL_RE.match(email):
             flash("Enter the email used for your crew account.", "error")
         else:
@@ -808,11 +980,16 @@ def crew_signin():
 
 @app.get("/crew/magic/<token>")
 def crew_magic(token):
+    enforce_rate_limit("crew-magic", 20, 600)
     serializer = URLSafeTimedSerializer(app.secret_key)
     try:
-        email = serializer.loads(token, salt="crew-login", max_age=1800)
-    except (BadSignature, SignatureExpired):
-        flash("That sign-in link has expired. Request another one.", "error")
+        payload = serializer.loads(token, salt="crew-login", max_age=1800)
+        email = payload.get("email", "")
+        nonce = payload.get("nonce", "")
+        if not email or not nonce:
+            raise BadSignature("Missing token fields")
+    except (BadSignature, SignatureExpired, AttributeError):
+        flash("That sign-in link has expired or was already replaced.", "error")
         return redirect(url_for("crew_signin"))
 
     try:
@@ -820,11 +997,27 @@ def crew_magic(token):
     except Exception:
         contact = None
 
-    if not contact or not contact_is_paid(contact):
-        flash("We could not find an active paid crew account.", "error")
+    props = (contact or {}).get("properties", {})
+    stored_nonce = props.get("login_nonce") or ""
+    if (
+        not contact
+        or not contact_is_paid(contact)
+        or not stored_nonce
+        or not secrets.compare_digest(str(stored_nonce), str(nonce))
+    ):
+        flash("That sign-in link is invalid or has already been used.", "error")
         return redirect(url_for("crew_signin"))
 
-    props = contact.get("properties") or {}
+    encoded = urllib.parse.quote(email, safe="")
+    status, _ = resend_request(
+        "PATCH",
+        f"/contacts/{encoded}",
+        {"properties": {"login_nonce": ""}},
+    )
+    if status not in (200, 201):
+        flash("Sign-in could not be completed securely. Request a new link.", "error")
+        return redirect(url_for("crew_signin"))
+
     amount = int(float(props.get("amount_paid", EARLY_PRICE)) * 100)
     login_crew(email, props.get("username") or "Crewmate", amount)
     return redirect(url_for("crew_account"))
@@ -834,8 +1027,7 @@ def crew_magic(token):
 def crew_logout():
     if not valid_csrf():
         abort(400)
-    for key in ("crew_email", "crew_username", "crew_amount_paid", "early_registered"):
-        session.pop(key, None)
+    session.clear()
     return redirect(url_for("home"))
 
 
