@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} — {{ site_name }}</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="open-page">
+  <main class="opened shell">
+    <p class="eyebrow"><span></span> ACCESS GRANTED <span></span></p>
+    <h1>{{ heading }}</h1>
+    <p>This protected route is live and ready for the actual hunt content. Until launch, the server blocks access before this page can render.</p>
+    <a class="primary link-button" href="/">← Return to the vault</a>
+  </main>
+</body>
+</html>
