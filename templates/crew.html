@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Early Crew — Internet Booty</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="secret-page">
+  <div class="noise" aria-hidden="true"></div>
+  <main class="crew-wrap shell">
+    <a class="brand crew-brand" href="/">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>Internet Booty</span>
+    </a>
+
+    <section class="crew-card">
+      <div class="crew-rune">✥</div>
+      <p class="section-kicker">EARLY CREW ACCOUNT</p>
+      <h1>Welcome aboard,<br><em>{{ username }}</em>.</h1>
+      <p class="crew-email">{{ email }}</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="crew-stats">
+        <div><small>RESERVED ENTRY</small><b>$10</b></div>
+        <div><small>REGULAR ENTRY</small><b class="struck">$20</b></div>
+        <div><small>STATUS</small><b>EARLY CREW</b></div>
+      </div>
+
+      <div class="crew-message">
+        <p>Your account and $10 early-entry rate are reserved. We are not collecting the entry payment yet; checkout will appear here after a payment provider that supports this contest model is connected.</p>
+      </div>
+
+      <a class="primary crew-home" href="/">RETURN TO THE VAULT</a>
+      <form method="post" action="{{ url_for('crew_logout') }}" class="logout-form">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <button type="submit">Sign out</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
