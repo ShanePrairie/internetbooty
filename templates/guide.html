@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {% include "_google_analytics.html" %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06131b">
+  <meta name="description" content="{{ guide.description }}">
+  <link rel="canonical" href="https://internetbooty.com/guides/{{ slug }}">
+  <meta property="og:title" content="{{ guide.title }} — Internet Booty">
+  <meta property="og:description" content="{{ guide.description }}">
+  <meta property="og:url" content="https://internetbooty.com/guides/{{ slug }}">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <title>{{ guide.title }} — Internet Booty</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": {{ guide.title|tojson }},
+    "description": {{ guide.description|tojson }},
+    "publisher": {"@type":"Organization","name":"Internet Booty"},
+    "mainEntityOfPage": "https://internetbooty.com/guides/{{ slug }}"
+  }
+  </script>
+</head>
+<body class="guide-page">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="guide-header shell">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>Internet Booty</span>
+    </a>
+    <a class="header-cta" href="/#countdown">THE FIRST VAULT</a>
+  </header>
+
+  <main>
+    <article class="guide-hero shell">
+      <p class="section-kicker">{{ guide.eyebrow }}</p>
+      <h1>{{ guide.heading }}</h1>
+      <p class="guide-intro">{{ guide.intro }}</p>
+
+      <div class="guide-body">
+        {% for section in guide.sections %}
+        <section>
+          <span class="guide-number">0{{ loop.index }}</span>
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.body }}</p>
+        </section>
+        {% endfor %}
+      </div>
+
+      <aside class="guide-cta">
+        <p class="section-kicker">THE FIRST VAULT</p>
+        <h2>Think you notice what other people miss?</h2>
+        <p>The countdown is running. The hunt is waiting. And one path on the homepage is quieter than the rest.</p>
+        <a class="primary link-button" href="/?utm_source=guide&utm_medium=organic&utm_campaign=field_notes">ENTER INTERNET BOOTY →</a>
+      </aside>
+
+      <nav class="guide-nav" aria-label="Internet Booty field notes">
+        <a href="/guides/how-online-treasure-hunts-work">Online Treasure Hunts</a>
+        <a href="/guides/puzzle-hunt-strategy">Puzzle Hunt Strategy</a>
+        <a href="/guides/cipher-solving-basics">Cipher Basics</a>
+        <a href="/guides/what-makes-a-great-online-treasure-hunt">Great Hunt Design</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="site-footer shell">
+    <span>© 2026 Internet Booty</span>
+    <a href="/">Back to the vault ↑</a>
+  </footer>
+</body>
+</html>
