@@ -34,9 +34,7 @@ if not SECRET_KEY and not IS_DEBUG:
 
 app.secret_key = SECRET_KEY or secrets.token_urlsafe(48)
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://internetbooty.onrender.com").rstrip("/")
-trusted_hosts = ["internetbooty.com", "www.internetbooty.com", "internetbooty.onrender.com"]
-if IS_DEBUG:
-    trusted_hosts.extend(["localhost", "127.0.0.1"])
+trusted_hosts = ["internetbooty.com", "www.internetbooty.com", "internetbooty.onrender.com", "internetbooty", "localhost", "127.0.0.1"]
 
 app.config.update(
     SESSION_COOKIE_NAME="__Host-internetbooty",
