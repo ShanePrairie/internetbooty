@@ -532,6 +532,7 @@ def robots():
         "User-agent: *\n"
         "Allow: /\n"
         "Disallow: /crew/\n"
+        "Disallow: /captains-mark\n"
         "Disallow: /api/\n"
         "Disallow: /webhooks/\n"
         "Sitemap: https://internetbooty.com/sitemap.xml\n",
@@ -541,16 +542,26 @@ def robots():
 
 @app.get("/sitemap.xml")
 def sitemap():
-    return Response(
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        "  <url>\n"
-        "    <loc>https://internetbooty.com/</loc>\n"
-        "    <lastmod>2026-09-24</lastmod>\n"
-        "  </url>\n"
-        "</urlset>\n",
-        mimetype="application/xml",
+    lastmod = datetime.now(timezone.utc).date().isoformat()
+    urls = [
+        ("https://internetbooty.com/", "daily", "1.0"),
+        *[(f"https://internetbooty.com/guides/{slug}", "monthly", "0.7") for slug in GUIDES],
+    ]
+    entries = "".join(
+        f"""  <url>
+    <loc>{url}</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>{changefreq}</changefreq>
+    <priority>{priority}</priority>
+  </url>
+"""
+        for url, changefreq, priority in urls
     )
+    body = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{entries}</urlset>
+"""
+    return Response(body, mimetype="application/xml")
 
 
 @app.route("/captains-mark", methods=["GET", "POST"])
@@ -804,44 +815,6 @@ def status():
         "prize": PRIZE_AMOUNT,
         "payments": "square",
     })
-
-
-@app.get("/robots.txt")
-def robots():
-    return Response(
-        "User-agent: *\n"
-        "Allow: /\n"
-        "Disallow: /crew/\n"
-        "Disallow: /captains-mark\n"
-        "Disallow: /webhooks/\n"
-        "Sitemap: https://internetbooty.com/sitemap.xml\n",
-        mimetype="text/plain",
-    )
-
-
-@app.get("/sitemap.xml")
-def sitemap():
-    lastmod = datetime.now(timezone.utc).date().isoformat()
-    body = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://internetbooty.com/</loc>
-    <lastmod>{lastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-""" + "".join(
-        f"""  <url>
-    <loc>https://internetbooty.com/guides/{slug}</loc>
-    <lastmod>{lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-"""
-        for slug in GUIDES
-    ) + """</urlset>
-"""
-    return Response(body, mimetype="application/xml")
 
 
 @app.get("/health")
