@@ -26,7 +26,7 @@
       <p class="eyebrow"><span></span> NOT EVERYONE WILL FIND THIS <span></span></p>
       <h1>Early Crew<br><em>Access.</em></h1>
       <p class="secret-lede">There are doors on this site that do not announce themselves. You found one.</p>
-      <p class="secret-body">Create an Early Crew account now and your entry rate for <strong>The First Vault</strong> is reserved at <strong>$10</strong> instead of the regular <strong>$20</strong>.</p>
+      <p class="secret-body">Create your Early Crew account through secure Square checkout for <strong>$10</strong> instead of the regular <strong>$20</strong>.</p>
 
       <div class="price-lockup">
         <div class="price-old">
@@ -42,7 +42,7 @@
 
       <div class="secret-note">
         <span>✦</span>
-        <p>Your $10 rate is reserved when your account is created. Payment is not collected on this page yet.</p>
+        <p>After Square confirms your $10 payment, your account activates immediately and you're added to the Early Crew.</p>
       </div>
     </section>
 
@@ -50,7 +50,7 @@
       <div class="register-emblem">☠</div>
       <p class="section-kicker">CAPTAIN'S MARK</p>
       <h2>Join the Early Crew.</h2>
-      <p class="register-intro">Your email becomes your account identity. Pick a pirate name, and we'll keep your $10 early-entry rate attached to it.</p>
+      <p class="register-intro">Your email becomes your account identity. Pick a pirate name, continue to Square, and your account activates the moment payment is confirmed.</p>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -84,11 +84,11 @@
           <span>Join the Internet Booty Early Crew email list for launch announcements, hunt updates, and account messages. You can unsubscribe from marketing emails later.</span>
         </label>
 
-        <button class="primary secret-submit" type="submit">CREATE ACCOUNT & RESERVE $10 RATE →</button>
+        <button class="primary secret-submit" type="submit">CONTINUE TO SECURE $10 CHECKOUT →</button>
       </form>
 
       <p class="signin-nudge">Already aboard? <a href="{{ url_for('crew_signin') }}">Sign in by email.</a></p>
-      <p class="fineprint">Finding this page does not reveal or unlock any hunt clues.</p>
+      <div class="square-trust"><span>□</span><b>Secure checkout powered by Square</b></div><p class="fineprint">Finding this page does not reveal or unlock any hunt clues.</p>
     </section>
   </main>
 </body>
