@@ -124,3 +124,14 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,calc(100% - 40px));
 .payment-status-line{display:flex;justify-content:center;align-items:center;gap:10px;margin:30px auto 22px;padding:16px;border:1px solid rgba(214,168,76,.2);background:rgba(214,168,76,.035);font:12px/1.4 Arial,sans-serif;color:#d5c69f}
 .pulse-dot{width:8px;height:8px;border-radius:50%;background:#d6a84c;box-shadow:0 0 0 0 rgba(214,168,76,.55);animation:pulsePay 1.8s infinite}
 @keyframes pulsePay{0%{box-shadow:0 0 0 0 rgba(214,168,76,.5)}70%{box-shadow:0 0 0 10px rgba(214,168,76,0)}100%{box-shadow:0 0 0 0 rgba(214,168,76,0)}}
+
+.share-section{padding:88px 0;border-block:1px solid rgba(214,168,76,.18);background:linear-gradient(135deg,#07141b,#091b23)}
+.share-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:70px;align-items:center}
+.share-grid h2{font-weight:400;font-size:clamp(38px,5vw,64px);line-height:1.02;margin:12px 0 18px;color:#ead9ab}
+.share-grid p:not(.section-kicker){max-width:690px;color:#9eabad;font-size:15px;line-height:1.75}
+.share-actions{display:grid;gap:11px}
+.share-link{display:block;width:100%;padding:14px 16px;border:1px solid rgba(214,168,76,.28);background:rgba(5,14,20,.36);color:#d9c58e;text-align:center;font:800 10px/1 Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.share-link:hover{border-color:rgba(214,168,76,.7);color:#f0d58f;background:rgba(214,168,76,.05)}
+.share-copy{font-family:Arial,sans-serif}
+@media(max-width:900px){.share-grid{grid-template-columns:1fr;gap:34px}}
+@media(max-width:600px){.share-section{padding:62px 0}}
