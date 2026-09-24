@@ -135,3 +135,22 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,calc(100% - 40px));
 .share-copy{font-family:Arial,sans-serif}
 @media(max-width:900px){.share-grid{grid-template-columns:1fr;gap:34px}}
 @media(max-width:600px){.share-section{padding:62px 0}}
+
+/* Organic field notes */
+.guide-page{min-height:100vh;background:radial-gradient(circle at 75% 12%,rgba(44,97,111,.16),transparent 25%),linear-gradient(180deg,#061018,#040b10)}
+.guide-header{height:92px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.guide-hero{padding:85px 0 100px;max-width:900px}
+.guide-hero>h1{font-size:clamp(54px,7.6vw,96px);font-weight:400;line-height:.94;letter-spacing:-.045em;color:#efdcaa;margin:16px 0 25px}
+.guide-intro{max-width:790px;font-size:20px;line-height:1.7;color:#bcc5c3}
+.guide-body{margin-top:65px;border-top:1px solid var(--line)}
+.guide-body section{position:relative;padding:48px 0 48px 74px;border-bottom:1px solid rgba(214,168,76,.15)}
+.guide-number{position:absolute;left:0;top:52px;color:rgba(214,168,76,.36);font-size:24px}
+.guide-body h2{font-size:32px;font-weight:400;color:#e5d6ad;margin:0 0 15px}
+.guide-body p{color:#a4b0b0;font-size:16px;line-height:1.85;margin:0}
+.guide-cta{margin:70px 0 45px;padding:38px;border:1px solid rgba(214,168,76,.32);background:linear-gradient(135deg,rgba(214,168,76,.055),rgba(7,21,29,.75))}
+.guide-cta h2{font-size:38px;font-weight:400;margin:10px 0;color:#ecdcae}
+.guide-cta>p:not(.section-kicker){color:#9eabad;line-height:1.75;max-width:650px}
+.guide-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.guide-nav a{padding:14px 16px;border:1px solid rgba(214,168,76,.16);color:#9f9579;font:800 9px/1.3 Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.guide-nav a:hover{border-color:rgba(214,168,76,.55);color:#e8cc86}
+@media(max-width:600px){.guide-header{height:74px}.guide-hero{padding:55px 0 75px}.guide-body section{padding-left:46px}.guide-nav{grid-template-columns:1fr}.guide-cta{padding:26px 22px}}
