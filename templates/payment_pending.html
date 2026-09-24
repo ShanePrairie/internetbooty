@@ -24,7 +24,7 @@
       <p class="fineprint">You can leave this page if needed. Square's secure payment webhook will still activate your account.</p>
     </section>
   </main>
-  <script>
+  <script nonce="{{ csp_nonce }}">
     (() => {
       const token = {{ token|tojson }};
       const text = document.getElementById('paymentText');
