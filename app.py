@@ -34,6 +34,7 @@ app.config.update(
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_SEGMENT_ID = os.getenv("RESEND_SEGMENT_ID", "")
+RESEND_WAITLIST_SEGMENT_ID = os.getenv("RESEND_WAITLIST_SEGMENT_ID", "")
 RESEND_TOPIC_ID = os.getenv("RESEND_TOPIC_ID", "")
 RESEND_FROM = os.getenv("RESEND_FROM", "Internet Booty <crew@internetbooty.com>")
 
@@ -246,6 +247,43 @@ def get_contact(email):
     if status == 404:
         return None
     raise RuntimeError(data.get("message", "Unable to read account."))
+
+
+def add_launch_watch_contact(email):
+    payload = {
+        "email": email,
+        "unsubscribed": False,
+        "properties": {"registration_source": "launch_watch"},
+    }
+    if RESEND_WAITLIST_SEGMENT_ID:
+        payload["segments"] = [{"id": RESEND_WAITLIST_SEGMENT_ID}]
+    if RESEND_TOPIC_ID:
+        payload["topics"] = [{"id": RESEND_TOPIC_ID, "subscription": "opt_in"}]
+
+    status, data = resend_request("POST", "/contacts", payload)
+    if status in (200, 201):
+        return data
+
+    if status == 409:
+        encoded = urllib.parse.quote(email, safe="")
+        status, data = resend_request(
+            "PATCH",
+            f"/contacts/{encoded}",
+            {"unsubscribed": False, "properties": {"registration_source": "launch_watch"}},
+        )
+        if status not in (200, 201):
+            raise RuntimeError(data.get("message", "Unable to join launch watch."))
+        if RESEND_WAITLIST_SEGMENT_ID:
+            resend_request("POST", f"/contacts/{encoded}/segments/{RESEND_WAITLIST_SEGMENT_ID}")
+        if RESEND_TOPIC_ID:
+            resend_request(
+                "PATCH",
+                f"/contacts/{encoded}/topics",
+                {"topics": [{"id": RESEND_TOPIC_ID, "subscription": "opt_in"}]},
+            )
+        return data
+
+    raise RuntimeError(data.get("message", "Unable to join launch watch."))
 
 
 def contact_is_paid(contact):
@@ -524,6 +562,27 @@ def guide(slug):
 @app.get("/")
 def home():
     return render_template("index.html", locked=request.args.get("locked") == "1")
+
+
+@app.post("/launch-watch")
+def launch_watch():
+    if not valid_csrf():
+        abort(400)
+    if request.form.get("website"):
+        return redirect(url_for("home"))
+
+    email = request.form.get("email", "").strip().lower()
+    if not EMAIL_RE.match(email):
+        flash("Enter a valid email to get the launch signal.", "error")
+        return redirect(url_for("home", watch="1") + "#launch-watch")
+
+    try:
+        add_launch_watch_contact(email)
+        flash("Signal locked in. We'll email you when the vault moves.", "success")
+    except Exception:
+        app.logger.exception("Launch watch signup failed")
+        flash("The signal was lost. Try again in a moment.", "error")
+    return redirect(url_for("home", watch="1") + "#launch-watch")
 
 
 @app.get("/robots.txt")
