@@ -20,6 +20,7 @@ app = Flask(__name__)
 SITE_NAME = os.getenv("SITE_NAME", "Internet Booty")
 PRIZE_AMOUNT = os.getenv("PRIZE_AMOUNT", "$5,000")
 LAUNCH_AT = os.getenv("LAUNCH_AT", "2026-10-14T18:24:00+00:00")
+HUNT_ENABLED = os.getenv("HUNT_ENABLED", "0") == "1"
 
 EARLY_PRICE = 10
 REGULAR_PRICE = 20
@@ -231,7 +232,7 @@ def apply_security_headers(response):
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
     response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
 
-    host = (request.host or "").split(":", 1)[0].lower()
+    host = (request.environ.get("HTTP_HOST") or "").split(":", 1)[0].lower()
     if host in {"internetbooty.com", "www.internetbooty.com"}:
         response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
@@ -257,7 +258,7 @@ def launch_datetime():
 
 
 def hunt_is_open():
-    return datetime.now(timezone.utc) >= launch_datetime()
+    return HUNT_ENABLED and datetime.now(timezone.utc) >= launch_datetime()
 
 
 def clear_auth_session():
@@ -661,7 +662,10 @@ def completed_order_details(order, expected_amount):
     if order.get("state") != "COMPLETED":
         return None
 
-    total = ((order.get("total_money") or {}).get("amount"))
+    total_money = order.get("total_money") or {}
+    total = total_money.get("amount")
+    if total_money.get("currency") != "USD":
+        raise RuntimeError("Completed Square order currency was not USD.")
     if int(total or 0) != int(expected_amount):
         raise RuntimeError("Completed Square order amount did not match the expected entry price.")
 
@@ -678,6 +682,12 @@ def activate_from_registration(registration, payment_id, paid_at):
     email = registration["email"]
     username = registration["username"]
     amount_cents = int(registration["amount"])
+
+    existing = get_contact(email)
+    existing_props = (existing or {}).get("properties", {})
+    if contact_is_paid(existing) and existing_props.get("square_payment_id") == payment_id:
+        return email, existing_props.get("username") or username, amount_cents
+
     activate_contact(email, username, payment_id, amount_cents, paid_at)
     try:
         send_welcome_email(email, username, amount_cents)
@@ -931,7 +941,11 @@ def square_webhook():
     try:
         registration = read_registration_token(token)
         expected = int(registration["amount"])
-        actual = int(((payment.get("amount_money") or {}).get("amount")) or 0)
+        amount_money = payment.get("amount_money") or {}
+        actual = int(amount_money.get("amount") or 0)
+        if amount_money.get("currency") != "USD":
+            app.logger.warning("Rejected non-USD Square payment for Internet Booty entry")
+            return "", 200
         if actual != expected:
             app.logger.warning("Square payment amount mismatch for Internet Booty entry")
             return "", 200
@@ -1060,7 +1074,7 @@ def status():
     now = datetime.now(timezone.utc)
     launch = launch_datetime()
     return jsonify({
-        "open": now >= launch,
+        "open": hunt_is_open(),
         "launchAt": launch.isoformat(),
         "secondsRemaining": max(0, int((launch - now).total_seconds())),
         "prize": PRIZE_AMOUNT,
