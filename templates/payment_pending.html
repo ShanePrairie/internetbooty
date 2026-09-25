@@ -33,11 +33,17 @@
       async function check() {
         tries++;
         try {
-          const response = await fetch('/crew/payment-status?token=' + encodeURIComponent(token), {credentials:'same-origin'});
+          const url = new URL('/crew/payment-status', window.location.origin);
+          url.searchParams.set('token', token);
+          if (orderId) url.searchParams.set('orderId', orderId);
+          const response = await fetch(url, {credentials:'same-origin', cache:'no-store'});
           const data = await response.json();
           if (data.paid) {
             text.textContent = 'Payment confirmed. Opening your account…';
-            location.href = '/crew/payment-return?token=' + encodeURIComponent(token);
+            const done = new URL('/crew/payment-return', window.location.origin);
+            done.searchParams.set('token', token);
+            if (orderId) done.searchParams.set('orderId', orderId);
+            location.href = done.toString();
             return;
           }
           if (data.expired) {
