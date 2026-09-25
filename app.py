@@ -1121,11 +1121,11 @@ def crew_account():
 @app.route("/crew/sign-in", methods=["GET", "POST"])
 def crew_signin():
     if request.method == "POST":
-        enforce_rate_limit("crew-signin-ip", 6, 600)
         if not valid_csrf():
             abort(400)
         email = request.form.get("email", "").strip().lower()
-        enforce_rate_limit("crew-signin-email", 3, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
+        enforce_rate_limit("crew-signin-ip", 12, 600)
+        enforce_rate_limit("crew-signin-email", 6, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
         if not EMAIL_RE.match(email):
             flash("Enter the email used for your crew account.", "error")
         else:
