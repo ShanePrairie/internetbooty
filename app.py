@@ -233,7 +233,7 @@ def apply_security_headers(response):
         "img-src 'self' data: https://images.stockcake.com https://www.google-analytics.com https://www.googletagmanager.com; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; "
         "font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; "
-        "form-action 'self'; upgrade-insecure-requests"
+        "form-action 'self' https://square.link https://checkout.square.site; upgrade-insecure-requests"
     )
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -845,7 +845,6 @@ def sitemap():
 @app.route("/captains-mark", methods=["GET", "POST"])
 def early_access():
     if request.method == "POST":
-        enforce_rate_limit("early-checkout-ip", 8, 600)
         if not valid_csrf():
             abort(400)
 
@@ -853,7 +852,6 @@ def early_access():
             return redirect(url_for("early_access"))
 
         email = request.form.get("email", "").strip().lower()
-        enforce_rate_limit("early-checkout-email", 4, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
         username = request.form.get("username", "").strip()
         consent = request.form.get("consent") == "yes"
 
@@ -865,6 +863,8 @@ def early_access():
             flash("You need to opt into Early Crew emails to continue.", "error")
         else:
             try:
+                enforce_rate_limit("early-checkout-ip", 12, 600)
+                enforce_rate_limit("early-checkout-email", 6, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
                 existing = get_contact(email)
                 if contact_is_paid(existing):
                     amount = int(float((existing.get("properties") or {}).get("amount_paid", EARLY_PRICE)) * 100)
