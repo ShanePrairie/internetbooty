@@ -52,7 +52,11 @@
       <a href="#prize">Prize</a>
       <a href="#locked">Locked</a>
     </nav>
+    {% if session.get("crew_email") %}
+    <a class="header-cta" href="{{ url_for('crew_account') }}">Crew Account</a>
+    {% else %}
     <a class="header-cta" href="#countdown">Await the Signal</a>
+    {% endif %}
   </header>
 
   <main>
@@ -79,6 +83,9 @@
         <div class="hero-actions">
           <button class="primary" type="button" id="signalButton"><span>⚔</span> THE GATE IS SEALED</button>
           <a class="secondary" href="#story">Discover the legend ↓</a>
+          {% if session.get("crew_email") %}
+          <a class="secondary crew-return-link" href="{{ url_for('crew_account') }}">← Back to Crew Account</a>
+          {% endif %}
         </div>
         <p class="microcopy">All protected hunt pages remain server-locked until the countdown ends.</p>
         <p class="secret-riddle" aria-label="A small clue">“The gate may be sealed, but captains know another way. Where gold sleeps beneath moonlight, a faint star marks the passage.”</p>
@@ -239,6 +246,9 @@
 
   <footer class="site-footer shell">
     <span>© 2026 {{ site_name }}</span>
+    {% if session.get("crew_email") %}
+    <a class="reddit-footer crew-footer-link" href="{{ url_for('crew_account') }}">☠ Crew Account</a>
+    {% endif %}
     <a class="reddit-footer" href="https://www.reddit.com/r/internetbooty/" target="_blank" rel="noopener noreferrer" aria-label="Join the Internet Booty community on Reddit">
       <span class="reddit-dot" aria-hidden="true">●</span>
       Join r/InternetBooty ↗
