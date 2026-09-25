@@ -42,7 +42,10 @@
         <p>Your Square payment is confirmed and your Internet Booty account is active. You are officially aboard for The First Vault.</p>
       </div>
 
-      <a class="primary crew-home" href="/">RETURN TO THE VAULT</a>
+      <div class="crew-actions">
+        <a class="primary crew-home" href="{{ url_for('crew_chat') }}">ENTER WORLD CHAT →</a>
+        <a class="crew-secondary" href="/">RETURN TO THE VAULT</a>
+      </div>
       <form method="post" action="{{ url_for('crew_logout') }}" class="logout-form">
         <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
         <button type="submit">Sign out</button>
