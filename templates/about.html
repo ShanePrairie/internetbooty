@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {% include "_google_analytics.html" %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06131b">
+  <meta name="description" content="Internet Booty is a live online treasure hunt filled with clues, ciphers, hidden paths, an Early Crew world chat, and a $5,000 grand prize.">
+  <link rel="canonical" href="https://internetbooty.com/about">
+  <meta property="og:title" content="What is Internet Booty? — The First Vault">
+  <meta property="og:description" content="A live online treasure hunt. The clock runs down, the vault opens, and the first eligible solver to finish the path wins the $5,000 grand prize.">
+  <meta property="og:url" content="https://internetbooty.com/about">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://images.stockcake.com/public/f/9/4/f94399c3-2270-4c9f-ba44-1e15b9c18a00_large/vault-door-treasure-stockcake.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>About Internet Booty — The First Vault</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="about-page">
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="about-header shell">
+    <a class="brand" href="/" aria-label="Internet Booty home">
+      <span class="brand-mark" aria-hidden="true">☠</span>
+      <span>Internet Booty</span>
+    </a>
+    <div class="about-header-actions">
+      {% if session.get("crew_email") %}
+      <a class="about-account-link" href="{{ url_for('crew_account') }}">Crew Account</a>
+      {% endif %}
+      <a class="header-cta" href="/">Return to the Vault</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="about-hero shell">
+      <div class="about-hero-copy">
+        <p class="eyebrow"><span></span> THE CAPTAIN'S BRIEFING <span></span></p>
+        <h1>So, what exactly<br>is <em>Internet Booty?</em></h1>
+        <p class="about-lede">A live online treasure hunt wrapped in a mystery. When the clock reaches zero, The First Vault opens. From there, the path is clues, ciphers, strange details, and whatever you notice that everyone else walks past.</p>
+        <p class="about-sublede">The first eligible solver to reach and submit the correct final solution wins the <strong>{{ prize_amount }} grand prize.</strong> The rest is intentionally left a little foggy.</p>
+
+        <div class="about-actions">
+          <a class="primary" href="/">ENTER THE VAULT →</a>
+          <a class="secondary" href="#how-it-works">How it works ↓</a>
+        </div>
+      </div>
+
+      <aside class="about-countdown-card">
+        <p class="section-kicker">THE FIRST VAULT OPENS IN</p>
+        <div class="about-countdown">
+          <div><b id="aboutDays">--</b><small>DAYS</small></div>
+          <div><b id="aboutHours">--</b><small>HRS</small></div>
+          <div><b id="aboutMinutes">--</b><small>MIN</small></div>
+          <div><b id="aboutSeconds">--</b><small>SEC</small></div>
+        </div>
+        <div class="about-seal">✥</div>
+        <p id="aboutCountdownText">Until then, the site is supposed to feel a little suspicious.</p>
+      </aside>
+    </section>
+
+    <section class="about-band" id="how-it-works">
+      <div class="shell">
+        <div class="about-section-head">
+          <p class="section-kicker">HOW IT WORKS</p>
+          <h2>You don't need a rulebook to begin.</h2>
+          <p>You need curiosity, a browser, and a willingness to follow something that might look unimportant.</p>
+        </div>
+
+        <div class="about-steps">
+          <article>
+            <span>01</span>
+            <h3>The timer ends.</h3>
+            <p>The protected hunt opens when the countdown hits zero. Before that, the real puzzle path remains sealed.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>The trail begins.</h3>
+            <p>Expect clues, codes, hidden details, research, pattern spotting, and a few moments where you're convinced you're overthinking it.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>One path reaches the finish.</h3>
+            <p>Follow the intended trail to the final solution. The first eligible solver to submit the correct answer takes the prize, subject to the official rules.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-mystery shell">
+      <div class="about-mystery-copy">
+        <p class="section-kicker">THE SITE IS PART OF THE ATMOSPHERE</p>
+        <h2>Not everything here needs to explain itself.</h2>
+        <p>Internet Booty is built to feel like a place you stumbled into rather than a checkout page wearing a pirate hat. Some things are obvious. Some things whisper. Some things are just there because they make the ship stranger.</p>
+        <p>That doesn't mean every odd detail is part of the hunt. Sometimes a weird button is just a weird button. Sometimes.</p>
+      </div>
+      <div class="about-mystery-mark" aria-hidden="true">
+        <span>?</span>
+        <small>PROBABLY NOTHING</small>
+      </div>
+    </section>
+
+    <section class="about-crew">
+      <div class="shell about-crew-grid">
+        <div>
+          <p class="section-kicker">EARLY CREW</p>
+          <h2>There is a way aboard before launch.</h2>
+          <p>Before the public entry opens at $20, there is a hidden Early Crew passage on the vault page. Find it and you can secure a $10 entry.</p>
+          <p>Early Crew also unlocks a private account area and a temporary world chat — more like a shared game lobby than a permanent forum.</p>
+          <div class="about-fairness-note">
+            <span>⚖</span>
+            <p><b>Early Crew does not get an advantage in the prize hunt.</b> The real hunt remains sealed until launch, and eligible entrants receive the same intended hunt path.</p>
+          </div>
+        </div>
+        <div class="about-crew-card">
+          <span class="about-crew-rune">☠</span>
+          <p>EARLY CREW ACCESS</p>
+          <b>$10</b>
+          <small>BEFORE PUBLIC $20 ENTRY</small>
+          {% if session.get("crew_email") %}
+          <a href="{{ url_for('crew_account') }}">OPEN CREW ACCOUNT →</a>
+          {% else %}
+          <a href="/">FIND THE PASSAGE →</a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="about-faq shell">
+      <div class="about-section-head">
+        <p class="section-kicker">THE USEFUL PART</p>
+        <h2>What you should know.</h2>
+      </div>
+
+      <div class="about-faq-grid">
+        <article>
+          <h3>Do I need special software?</h3>
+          <p>No. The hunt is designed around the web. A normal modern browser and your own puzzle-solving tools are enough to start.</p>
+        </article>
+        <article>
+          <h3>Is the world chat part of the hunt?</h3>
+          <p>No. It is a social room for paid Crew members. It exists for community and atmosphere, not as a source of privileged hunt clues.</p>
+        </article>
+        <article>
+          <h3>Can I join after launch?</h3>
+          <p>The public path is planned to open with the hunt. Early Crew is the pre-launch path and carries the lower entry price while it is available.</p>
+        </article>
+        <article>
+          <h3>Why is so much still vague?</h3>
+          <p>Because discovery is part of the fun. You should understand what you're entering without having the experience explained to death before it begins.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-final shell">
+      <div class="compass" aria-hidden="true">✥</div>
+      <p class="section-kicker">ONE LAST THING</p>
+      <h2>The vault page tells you more than it looks like it does.</h2>
+      <p>If you're interested in Early Crew, go back and look around. We made the trail easier to notice. We did not make it a button that says “buy now.”</p>
+      <a class="primary" href="/">RETURN TO THE VAULT →</a>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <span>© 2026 {{ site_name }}</span>
+    <a class="about-footer-link" href="/">The Vault</a>
+    <a class="reddit-footer" href="https://www.reddit.com/r/internetbooty/" target="_blank" rel="noopener noreferrer">
+      <span class="reddit-dot" aria-hidden="true">●</span>
+      Join r/InternetBooty ↗
+    </a>
+    <span>Built for the curious.</span>
+  </footer>
+
+  <script nonce="{{ csp_nonce }}">
+  (() => {
+    const launch = new Date({{ launch_at|tojson }}).getTime();
+    const d = document.getElementById('aboutDays');
+    const h = document.getElementById('aboutHours');
+    const m = document.getElementById('aboutMinutes');
+    const s = document.getElementById('aboutSeconds');
+    const message = document.getElementById('aboutCountdownText');
+
+    function tick() {
+      const remaining = Math.max(0, launch - Date.now());
+      const total = Math.floor(remaining / 1000);
+      d.textContent = String(Math.floor(total / 86400)).padStart(2, '0');
+      h.textContent = String(Math.floor((total % 86400) / 3600)).padStart(2, '0');
+      m.textContent = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+      s.textContent = String(total % 60).padStart(2, '0');
+      if (remaining <= 0) message.textContent = 'The vault is open. The briefing is over.';
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+  </script>
+</body>
+</html>
