@@ -49,6 +49,7 @@
     </a>
     <nav aria-label="Main navigation">
       <a href="#story">The Hunt</a>
+      <a href="{{ url_for('about') }}">About</a>
       <a href="#prize">Prize</a>
       <a href="#locked">Locked</a>
     </nav>
@@ -87,7 +88,7 @@
           <a class="secondary crew-return-link" href="{{ url_for('crew_account') }}">← Back to Crew Account</a>
           {% endif %}
         </div>
-        <p class="microcopy">All protected hunt pages remain server-locked until the countdown ends.</p>
+        <p class="microcopy">All protected hunt pages remain server-locked until the countdown ends. <a class="briefing-link" href="{{ url_for('about') }}">New here? Read the captain's briefing.</a></p>
         {% if not session.get("crew_email") %}
         <a class="early-trail" href="#prize" aria-label="Follow the Early Crew clue to the gold prize">
           <span class="early-trail-label">✦ EARLY CREW CLUE</span>
@@ -261,6 +262,7 @@
 
   <footer class="site-footer shell">
     <span>© 2026 {{ site_name }}</span>
+    <a class="about-footer-link" href="{{ url_for('about') }}">About the Vault</a>
     {% if session.get("crew_email") %}
     <a class="reddit-footer crew-footer-link" href="{{ url_for('crew_account') }}">☠ Crew Account</a>
     {% endif %}
