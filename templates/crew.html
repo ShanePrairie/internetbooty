@@ -3,54 +3,244 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <meta name="theme-color" content="#061018">
   <title>Early Crew — Internet Booty</title>
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
 </head>
-<body class="secret-page">
+<body class="secret-page crew-dashboard-page">
   <div class="noise" aria-hidden="true"></div>
-  <main class="crew-wrap shell">
-    <a class="brand crew-brand" href="/">
+  <div class="crew-dashboard-glow" aria-hidden="true"></div>
+
+  <header class="crew-dashboard-top shell">
+    <a class="brand" href="/">
       <span class="brand-mark" aria-hidden="true">☠</span>
       <span>Internet Booty</span>
     </a>
+    <div class="crew-top-actions">
+      <span class="crew-live-pill"><i></i> EARLY CREW ACTIVE</span>
+      <a href="/" class="crew-top-link">VAULT</a>
+    </div>
+  </header>
 
-    <section class="crew-card">
-      <div class="crew-rune">✥</div>
-      <p class="section-kicker">EARLY CREW ACCOUNT</p>
-      <h1>Welcome aboard,<br><em>{{ username }}</em>.</h1>
-      <p class="crew-email">{{ email }}</p>
+  <main class="crew-dashboard shell">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack crew-flashes">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="flash-stack">
-            {% for category, message in messages %}
-              <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
+    <section class="crew-command-hero">
+      <div class="crew-command-copy">
+        <button class="crew-rune crew-rune-button" id="crewRune" type="button" aria-label="A brass crew emblem">✥</button>
+        <p class="section-kicker">THE CAPTAIN'S QUARTERS</p>
+        <h1>You're aboard,<br><em>{{ username }}</em>.</h1>
+        <p class="crew-command-lede">You found the hidden passage, secured Early Crew access, and made it behind the vault door before launch.</p>
+
+        <div class="crew-status-row">
+          <span><i></i> PAID & ACTIVE</span>
+          <span>EARLY ENTRY · ${{ "%.0f"|format(amount_paid) }}</span>
+          <span>PUBLIC ENTRY · $20</span>
+        </div>
+      </div>
+
+      <aside class="crew-launch-panel">
+        <p class="section-kicker">THE FIRST VAULT</p>
+        <div class="crew-countdown" data-launch="{{ launch_at }}">
+          <div><b id="crewDays">--</b><small>DAYS</small></div>
+          <div><b id="crewHours">--</b><small>HRS</small></div>
+          <div><b id="crewMinutes">--</b><small>MIN</small></div>
+          <div><b id="crewSeconds">--</b><small>SEC</small></div>
+        </div>
+        <p id="crewCountdownText">Your passage is secured. The vault is still sealed.</p>
+        <a class="crew-launch-link" href="/">WATCH THE VAULT →</a>
+      </aside>
+    </section>
+
+    <section class="crew-dashboard-grid">
+      <a class="crew-dashboard-card crew-chat-launch" href="{{ url_for('crew_chat') }}">
+        <span class="crew-card-icon">☊</span>
+        <span class="crew-card-status"><i></i> LIVE</span>
+        <h2>World Chat</h2>
+        <p>Drop into the one-room Early Crew channel. Talk theories, meet the crew, or just lurk.</p>
+        <b>ENTER THE CREW DECK →</b>
+      </a>
+
+      <a class="crew-dashboard-card" href="/">
+        <span class="crew-card-icon">⌾</span>
+        <h2>The Vault</h2>
+        <p>Return to the public vault, countdown, prize board, and hidden Early Crew trail.</p>
+        <b>RETURN TO THE VAULT →</b>
+      </a>
+
+      <a class="crew-dashboard-card" href="https://www.reddit.com/r/internetbooty/" target="_blank" rel="noopener noreferrer">
+        <span class="crew-card-icon">●</span>
+        <h2>r/InternetBooty</h2>
+        <p>The public campfire. Post theories, screenshots, discoveries, and whatever the crew digs up.</p>
+        <b>OPEN THE SUBREDDIT ↗</b>
+      </a>
+
+      <button class="crew-dashboard-card crew-share-card" id="crewShare" type="button">
+        <span class="crew-card-icon">↗</span>
+        <h2>Bring Someone Aboard</h2>
+        <p>Send somebody the vault. Let them figure out the hidden Early Crew passage for themselves.</p>
+        <b id="crewShareLabel">SHARE THE VAULT →</b>
+      </button>
+    </section>
+
+    <section class="crew-lower-grid">
+      <div class="crew-account-panel">
+        <div class="crew-panel-head">
+          <div>
+            <p class="section-kicker">YOUR PASSAGE</p>
+            <h2>Account status</h2>
           </div>
-        {% endif %}
-      {% endwith %}
+          <span class="crew-verified-mark">✓ VERIFIED</span>
+        </div>
 
-      <div class="crew-stats">
-        <div><small>ENTRY PAID</small><b>${{ "%.0f"|format(amount_paid) }}</b></div>
-        <div><small>REGULAR ENTRY</small><b class="struck">$20</b></div>
-        <div><small>STATUS</small><b>PAID & ACTIVE</b></div>
+        <div class="crew-account-lines">
+          <div><span>PIRATE NAME</span><b>{{ username }}</b></div>
+          <div><span>ACCOUNT EMAIL</span><b>{{ email }}</b></div>
+          <div><span>ENTRY PAID</span><b>${{ "%.0f"|format(amount_paid) }}</b></div>
+          <div><span>ACCESS</span><b>EARLY CREW</b></div>
+        </div>
+
+        <div class="crew-security-note">
+          <span>⌁</span>
+          <p><b>Passwordless access.</b> Sign-in links expire after 30 minutes. You never need to create or remember a password.</p>
+        </div>
       </div>
 
-      <div class="crew-message">
-        <p>Your Square payment is confirmed and your Internet Booty account is active. You are officially aboard for The First Vault.</p>
+      <div class="crew-bulletin">
+        <p class="section-kicker">CREW BULLETIN</p>
+        <h2>Before the signal.</h2>
+        <div class="crew-bulletin-items">
+          <div><span>01</span><p><b>Your entry is locked in.</b><br>You do not need to buy access again.</p></div>
+          <div><span>02</span><p><b>World Chat is temporary.</b><br>It is built like a game lobby, not a permanent forum.</p></div>
+          <div><span>03</span><p><b>The real hunt stays sealed.</b><br>Early Crew status does not expose the live puzzle path before launch.</p></div>
+        </div>
       </div>
+    </section>
 
-      <div class="crew-actions">
-        <a class="primary crew-home" href="{{ url_for('crew_chat') }}">ENTER WORLD CHAT →</a>
-        <a class="crew-secondary" href="/">RETURN TO THE VAULT</a>
+    <section class="crew-oddities" aria-label="Crew curiosities">
+      <div>
+        <p class="section-kicker">SHIP'S JUNK DRAWER</p>
+        <h2>Absolutely nonessential.</h2>
+        <p>Every respectable headquarters needs at least one thing with no practical value whatsoever.</p>
       </div>
+      <button class="brass-locker" id="brassLocker" type="button" aria-expanded="false">
+        <span class="brass-screw">✦</span>
+        <span>DO NOT OPEN</span>
+      </button>
+      <div class="locker-drawer" id="lockerDrawer" hidden>
+        <span class="locker-stamp">PROPERTY OF NOBODY</span>
+        <p id="lockerMessage">The drawer contains one expired arcade token, a bent paperclip, and an unreasonable amount of confidence.</p>
+        <button type="button" id="lockerAgain">RUMMAGE AGAIN</button>
+      </div>
+    </section>
+
+    <div class="crew-easter-toast" id="crewEasterToast" role="status" aria-live="polite" hidden>
+      You clicked the shiny thing five times. Excellent judgment. ✦
+    </div>
+
+    <footer class="crew-dashboard-footer">
+      <span>EARLY CREW · INTERNET BOOTY</span>
       <form method="post" action="{{ url_for('crew_logout') }}" class="logout-form">
         <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
         <button type="submit">Sign out</button>
       </form>
-    </section>
+    </footer>
   </main>
+
+  <script nonce="{{ csp_nonce }}">
+  (() => {
+    const launchAt = new Date({{ launch_at|tojson }}).getTime();
+    const ids = {
+      d: document.getElementById('crewDays'),
+      h: document.getElementById('crewHours'),
+      m: document.getElementById('crewMinutes'),
+      s: document.getElementById('crewSeconds')
+    };
+    const countdownText = document.getElementById('crewCountdownText');
+
+    function tick() {
+      const remaining = Math.max(0, launchAt - Date.now());
+      const total = Math.floor(remaining / 1000);
+      ids.d.textContent = String(Math.floor(total / 86400)).padStart(2, '0');
+      ids.h.textContent = String(Math.floor((total % 86400) / 3600)).padStart(2, '0');
+      ids.m.textContent = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+      ids.s.textContent = String(total % 60).padStart(2, '0');
+      if (remaining <= 0) countdownText.textContent = 'The signal has arrived. Check the vault.';
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    const share = document.getElementById('crewShare');
+    const shareLabel = document.getElementById('crewShareLabel');
+    const shareUrl = 'https://internetbooty.com/?utm_source=crew&utm_medium=share&utm_campaign=first_vault';
+    share.addEventListener('click', async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Internet Booty — The First Vault',
+            text: 'I found the hidden Early Crew path in this $5,000 online treasure hunt. See if you can find it.',
+            url: shareUrl
+          });
+          return;
+        }
+        await navigator.clipboard.writeText(shareUrl);
+        shareLabel.textContent = 'LINK COPIED ✓';
+        setTimeout(() => shareLabel.textContent = 'SHARE THE VAULT →', 2200);
+      } catch (_) {}
+    });
+
+    const drawer = document.getElementById('lockerDrawer');
+    const locker = document.getElementById('brassLocker');
+    const message = document.getElementById('lockerMessage');
+    const again = document.getElementById('lockerAgain');
+    const junk = [
+      'The drawer contains one expired arcade token, a bent paperclip, and an unreasonable amount of confidence.',
+      'You found a floppy disk labeled “probably important.” Nobody owns a floppy drive.',
+      'Inside: a tiny plastic dinosaur wearing an even tinier paper crown.',
+      'A receipt from 2007. The purchase was one energy drink and six feet of rope. No explanation survives.',
+      'There is a button labeled “DO NOT PRESS.” It is not connected to anything. Probably.',
+      'You found a handwritten password: swordfish. It unlocks absolutely nothing.',
+      'A fortune cookie slip reads: “You will close seventeen browser tabs today.” Bold prediction.'
+    ];
+    function rummage() {
+      message.textContent = junk[Math.floor(Math.random() * junk.length)];
+    }
+    locker.addEventListener('click', () => {
+      drawer.hidden = !drawer.hidden;
+      locker.setAttribute('aria-expanded', String(!drawer.hidden));
+      if (!drawer.hidden) rummage();
+    });
+    again.addEventListener('click', rummage);
+
+    let runeClicks = 0;
+    let runeTimer;
+    const rune = document.getElementById('crewRune');
+    const easter = document.getElementById('crewEasterToast');
+    rune.addEventListener('click', () => {
+      runeClicks++;
+      clearTimeout(runeTimer);
+      runeTimer = setTimeout(() => runeClicks = 0, 2200);
+      if (runeClicks >= 5) {
+        runeClicks = 0;
+        easter.hidden = false;
+        document.body.classList.add('crew-secret-glint');
+        setTimeout(() => {
+          easter.hidden = true;
+          document.body.classList.remove('crew-secret-glint');
+        }, 3600);
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
