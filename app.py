@@ -837,6 +837,11 @@ def home():
     return render_template("index.html", locked=request.args.get("locked") == "1")
 
 
+@app.get("/about")
+def about():
+    return render_template("about.html")
+
+
 @app.post("/launch-watch")
 def launch_watch():
     enforce_rate_limit("launch-watch", 6, 3600)
@@ -882,6 +887,7 @@ def sitemap():
     lastmod = datetime.now(timezone.utc).date().isoformat()
     urls = [
         ("https://internetbooty.com/", "daily", "1.0"),
+        ("https://internetbooty.com/about", "monthly", "0.8"),
         *[(f"https://internetbooty.com/guides/{slug}", "monthly", "0.7") for slug in GUIDES],
     ]
     entries = "".join(
