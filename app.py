@@ -14,6 +14,7 @@ from functools import wraps
 
 from flask import Flask, Response, abort, flash, g, jsonify, redirect, render_template, request, session, url_for
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+import redis
 
 app = Flask(__name__)
 
@@ -52,6 +53,17 @@ RESEND_SEGMENT_ID = os.getenv("RESEND_SEGMENT_ID", "")
 RESEND_WAITLIST_SEGMENT_ID = os.getenv("RESEND_WAITLIST_SEGMENT_ID", "")
 RESEND_TOPIC_ID = os.getenv("RESEND_TOPIC_ID", "")
 RESEND_FROM = os.getenv("RESEND_FROM", "Internet Booty <crew@internetbooty.com>")
+
+REDIS_URL = os.getenv("REDIS_URL", "")
+CHAT_KEY = "internetbooty:crew:worldchat"
+CHAT_LIMIT = 150
+CHAT_REDIS = redis.Redis.from_url(
+    REDIS_URL,
+    decode_responses=True,
+    socket_connect_timeout=2,
+    socket_timeout=2,
+    health_check_interval=30,
+) if REDIS_URL else None
 
 SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "")
 SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "")
@@ -332,9 +344,40 @@ def csrf_token():
 
 
 def valid_csrf():
-    sent = request.form.get("_csrf", "")
+    sent = request.form.get("_csrf", "") or request.headers.get("X-CSRF-Token", "")
     expected = session.get("_csrf", "")
     return bool(sent and expected and secrets.compare_digest(sent, expected))
+
+
+def get_chat_messages():
+    if not CHAT_REDIS:
+        return []
+    raw = CHAT_REDIS.lrange(CHAT_KEY, -CHAT_LIMIT, -1)
+    messages = []
+    for item in raw:
+        try:
+            messages.append(json.loads(item))
+        except (TypeError, json.JSONDecodeError):
+            continue
+    return messages
+
+
+def append_chat_message(username, text):
+    if not CHAT_REDIS:
+        raise RuntimeError("World chat is not configured.")
+
+    message = {
+        "id": secrets.token_hex(8),
+        "username": username,
+        "text": text,
+        "ts": datetime.now(timezone.utc).isoformat(),
+    }
+    pipe = CHAT_REDIS.pipeline()
+    pipe.rpush(CHAT_KEY, json.dumps(message, separators=(",", ":")))
+    pipe.ltrim(CHAT_KEY, -CHAT_LIMIT, -1)
+    pipe.expire(CHAT_KEY, 60 * 60 * 24 * 7)
+    pipe.execute()
+    return message
 
 
 def registration_serializer():
@@ -957,6 +1000,52 @@ def square_webhook():
         return jsonify({"error": "activation failed"}), 500
 
     return "", 200
+
+
+@app.get("/crew/chat")
+@crew_gate
+def crew_chat():
+    return render_template(
+        "chat.html",
+        username=session.get("crew_username", "Crewmate"),
+    )
+
+
+@app.get("/api/crew/chat")
+@crew_gate
+def crew_chat_messages():
+    try:
+        messages = get_chat_messages()
+    except redis.RedisError:
+        app.logger.exception("Crew world chat read failed")
+        return jsonify({"messages": [], "offline": True}), 503
+    return jsonify({"messages": messages, "offline": False})
+
+
+@app.post("/api/crew/chat")
+@crew_gate
+def crew_chat_post():
+    enforce_rate_limit("crew-world-chat", 8, 30, session.get("crew_email", ""))
+    if not valid_csrf():
+        abort(400)
+
+    data = request.get_json(silent=True) or {}
+    text_value = str(data.get("text", "")).strip()
+    text_value = re.sub(r"\s+", " ", text_value)
+
+    if not text_value:
+        return jsonify({"error": "Say something first."}), 400
+    if len(text_value) > 220:
+        return jsonify({"error": "Keep messages under 220 characters."}), 400
+
+    username = session.get("crew_username", "Crewmate")
+    try:
+        message = append_chat_message(username, text_value)
+    except redis.RedisError:
+        app.logger.exception("Crew world chat write failed")
+        return jsonify({"error": "World chat is temporarily offline."}), 503
+
+    return jsonify({"message": message}), 201
 
 
 @app.get("/crew")
