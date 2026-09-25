@@ -957,7 +957,7 @@ def square_return():
     except Exception:
         app.logger.exception("Unable to read paid account after Square redirect")
 
-    order_id = session.get("pending_square_order_id")
+    order_id = (session.get("pending_square_order_id") or request.args.get("orderId", "")).strip()
     if order_id:
         try:
             order = square_order(order_id)
@@ -974,7 +974,7 @@ def square_return():
         except Exception:
             app.logger.exception("Square payment return verification failed")
 
-    return render_template("payment_pending.html", token=token)
+    return render_template("payment_pending.html", token=token, order_id=order_id)
 
 
 @app.get("/crew/payment-status")
@@ -996,7 +996,7 @@ def square_payment_status():
     except Exception:
         app.logger.exception("Payment status contact lookup failed")
 
-    order_id = session.get("pending_square_order_id")
+    order_id = (session.get("pending_square_order_id") or request.args.get("orderId", "")).strip()
     if not order_id:
         return jsonify({"paid": False})
 
