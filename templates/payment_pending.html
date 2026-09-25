@@ -27,6 +27,7 @@
   <script nonce="{{ csp_nonce }}">
     (() => {
       const token = {{ token|tojson }};
+      const orderId = {{ order_id|default("")|tojson }};
       const text = document.getElementById('paymentText');
       let tries = 0;
       async function check() {
