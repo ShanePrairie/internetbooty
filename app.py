@@ -258,6 +258,58 @@ def apply_security_headers(response):
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_-]{3,24}$")
 
+USERNAME_LEET_MAP = str.maketrans({
+    "0": "o",
+    "1": "i",
+    "3": "e",
+    "4": "a",
+    "5": "s",
+    "7": "t",
+    "8": "b",
+    "9": "g",
+})
+USERNAME_BLOCKED_WORDS = {
+    "fuck", "fucker", "fucking", "motherfucker",
+    "shit", "shithead", "bullshit",
+    "bitch", "cunt",
+    "asshole", "arsehole",
+    "whore", "slut", "pussy",
+    "dick", "dickhead", "cock", "cocksucker",
+    "nigger", "nigga", "faggot", "fag",
+    "retard", "retarded",
+    "chink", "spic", "kike", "wetback",
+}
+USERNAME_BLOCKED_PATTERNS = (
+    re.compile(r"fuck"),
+    re.compile(r"motherfucker"),
+    re.compile(r"cunt"),
+    re.compile(r"asshole"),
+    re.compile(r"whore"),
+    re.compile(r"slut"),
+    re.compile(r"pussy"),
+    re.compile(r"nigg(?:er|a)"),
+    re.compile(r"fagg?ot"),
+    re.compile(r"retard"),
+    re.compile(r"chink"),
+    re.compile(r"spic"),
+    re.compile(r"kike"),
+    re.compile(r"wetback"),
+    re.compile(r"(?:dick|cock)(?:head|face|wad|bag|sucker|hole)"),
+)
+
+
+def username_is_allowed(username):
+    lowered = username.lower().translate(USERNAME_LEET_MAP)
+    tokens = [token for token in re.split(r"[_-]+", lowered) if token]
+    compact = re.sub(r"[_-]+", "", lowered)
+
+    if any(token in USERNAME_BLOCKED_WORDS for token in tokens):
+        return False
+    if compact in USERNAME_BLOCKED_WORDS:
+        return False
+    return not any(pattern.search(compact) for pattern in USERNAME_BLOCKED_PATTERNS)
+
+
 
 def launch_datetime():
     value = LAUNCH_AT.replace("Z", "+00:00")
@@ -859,6 +911,8 @@ def early_access():
             flash("Enter a valid email address.", "error")
         elif not USERNAME_RE.match(username):
             flash("Pirate name must be 3–24 characters using letters, numbers, _ or -.", "error")
+        elif not username_is_allowed(username):
+            flash("That pirate name isn't allowed. Pick a cleaner one and try again.", "error")
         elif not consent:
             flash("You need to opt into Early Crew emails to continue.", "error")
         else:
