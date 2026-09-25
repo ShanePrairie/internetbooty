@@ -360,8 +360,7 @@ def paid_session_valid(max_verification_age=300):
         clear_auth_session()
         return False
 
-    props = contact.get("properties") or {}
-    session["crew_username"] = props.get("username") or session.get("crew_username") or "Crewmate"
+    session["crew_username"] = contact_property(contact, "username") or session.get("crew_username") or "Crewmate"
     session["paid_verified_at"] = now
     return True
 
@@ -527,9 +526,18 @@ def add_launch_watch_contact(email):
     raise RuntimeError(data.get("message", "Unable to join launch watch."))
 
 
+def contact_property(contact, key, default=None):
+    value = ((contact or {}).get("properties") or {}).get(key, default)
+    if isinstance(value, dict) and "value" in value:
+        return value.get("value", default)
+    return value
+
+
 def contact_is_paid(contact):
-    props = (contact or {}).get("properties", {})
-    return props.get("entry_status") == "paid" and bool(props.get("square_payment_id"))
+    return (
+        contact_property(contact, "entry_status") == "paid"
+        and bool(contact_property(contact, "square_payment_id"))
+    )
 
 
 def activate_contact(email, username, payment_id, amount_cents, paid_at):
@@ -777,9 +785,8 @@ def activate_from_registration(registration, payment_id, paid_at):
     amount_cents = int(registration["amount"])
 
     existing = get_contact(email)
-    existing_props = (existing or {}).get("properties", {})
-    if contact_is_paid(existing) and existing_props.get("square_payment_id") == payment_id:
-        return email, existing_props.get("username") or username, amount_cents
+    if contact_is_paid(existing) and contact_property(existing, "square_payment_id") == payment_id:
+        return email, contact_property(existing, "username") or username, amount_cents
 
     activate_contact(email, username, payment_id, amount_cents, paid_at)
     try:
@@ -921,8 +928,8 @@ def early_access():
                 enforce_rate_limit("early-checkout-email", 6, 600, hashlib.sha256(email.encode("utf-8")).hexdigest()[:16])
                 existing = get_contact(email)
                 if contact_is_paid(existing):
-                    amount = int(float((existing.get("properties") or {}).get("amount_paid", EARLY_PRICE)) * 100)
-                    login_crew(email, (existing.get("properties") or {}).get("username") or username, amount)
+                    amount = int(float(contact_property(existing, "amount_paid", EARLY_PRICE)) * 100)
+                    login_crew(email, contact_property(existing, "username") or username, amount)
                     flash("You're already aboard. No second payment was taken.", "success")
                     return redirect(url_for("crew_account"))
 
@@ -1152,8 +1159,7 @@ def crew_magic(token):
     except Exception:
         contact = None
 
-    props = (contact or {}).get("properties", {})
-    stored_nonce = props.get("login_nonce") or ""
+    stored_nonce = contact_property(contact, "login_nonce") or ""
     if (
         not contact
         or not contact_is_paid(contact)
@@ -1173,8 +1179,8 @@ def crew_magic(token):
         flash("Sign-in could not be completed securely. Request a new link.", "error")
         return redirect(url_for("crew_signin"))
 
-    amount = int(float(props.get("amount_paid", EARLY_PRICE)) * 100)
-    login_crew(email, props.get("username") or "Crewmate", amount)
+    amount = int(float(contact_property(contact, "amount_paid", EARLY_PRICE)) * 100)
+    login_crew(email, contact_property(contact, "username") or "Crewmate", amount)
     return redirect(url_for("crew_account"))
 
 
