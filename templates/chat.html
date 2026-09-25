@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <meta name="theme-color" content="#061018">
+  <title>Crew World Chat — Internet Booty</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body class="secret-page chat-page">
+  <div class="noise" aria-hidden="true"></div>
+
+  <main class="chat-shell shell">
+    <header class="chat-topbar">
+      <a class="brand" href="{{ url_for('crew_account') }}">
+        <span class="brand-mark" aria-hidden="true">☠</span>
+        <span>Internet Booty</span>
+      </a>
+      <div class="chat-room-label"><span class="chat-live-dot"></span> EARLY CREW · WORLD CHAT</div>
+    </header>
+
+    <section class="world-chat-card">
+      <div class="world-chat-head">
+        <div>
+          <p class="section-kicker">THE CREW DECK</p>
+          <h1>World Chat</h1>
+          <p>One room. Every paid crewmate. Messages roll off as the room fills.</p>
+        </div>
+        <a class="chat-back" href="{{ url_for('crew_account') }}">← ACCOUNT</a>
+      </div>
+
+      <div id="chatStatus" class="chat-status">Connecting to the crew…</div>
+      <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-label="Early Crew world chat"></div>
+
+      <form id="chatForm" class="chat-compose" autocomplete="off">
+        <input type="hidden" id="chatCsrf" value="{{ csrf_token() }}">
+        <div class="chat-compose-user">
+          <span class="chat-avatar" aria-hidden="true">{{ username[:1]|upper }}</span>
+          <b>{{ username }}</b>
+        </div>
+        <div class="chat-input-row">
+          <input id="chatInput" maxlength="220" placeholder="Message the crew…" aria-label="Message the crew" required>
+          <button class="primary" type="submit">SEND</button>
+        </div>
+        <div class="chat-compose-meta">
+          <small>Members only · Keep hunt spoilers respectful.</small>
+          <small><span id="chatCount">0</span>/220</small>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script nonce="{{ csp_nonce }}">
+  (() => {
+    const list = document.getElementById('chatMessages');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('chatInput');
+    const count = document.getElementById('chatCount');
+    const status = document.getElementById('chatStatus');
+    const csrf = document.getElementById('chatCsrf').value;
+    let rendered = new Set();
+    let firstLoad = true;
+
+    function nearBottom() {
+      return list.scrollHeight - list.scrollTop - list.clientHeight < 110;
+    }
+
+    function formatTime(value) {
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+    }
+
+    function addMessage(message, stick) {
+      if (!message || !message.id || rendered.has(message.id)) return;
+      rendered.add(message.id);
+
+      const row = document.createElement('article');
+      row.className = 'chat-message';
+
+      const avatar = document.createElement('span');
+      avatar.className = 'chat-avatar';
+      avatar.textContent = (message.username || '?').slice(0,1).toUpperCase();
+
+      const body = document.createElement('div');
+      body.className = 'chat-message-body';
+
+      const meta = document.createElement('div');
+      meta.className = 'chat-message-meta';
+
+      const name = document.createElement('b');
+      name.textContent = message.username || 'Crewmate';
+
+      const time = document.createElement('time');
+      time.textContent = formatTime(message.ts);
+
+      const text = document.createElement('p');
+      text.textContent = message.text || '';
+
+      meta.append(name, time);
+      body.append(meta, text);
+      row.append(avatar, body);
+      list.append(row);
+
+      while (list.children.length > 150) {
+        const old = list.firstElementChild;
+        if (old) old.remove();
+      }
+      if (stick) list.scrollTop = list.scrollHeight;
+    }
+
+    async function refresh() {
+      const shouldStick = firstLoad || nearBottom();
+      try {
+        const res = await fetch('{{ url_for("crew_chat_messages") }}', {credentials:'same-origin', cache:'no-store'});
+        if (res.status === 401 || res.redirected) {
+          location.href = '{{ url_for("crew_signin") }}';
+          return;
+        }
+        const data = await res.json();
+        if (!res.ok || data.offline) throw new Error('offline');
+        (data.messages || []).forEach(m => addMessage(m, shouldStick));
+        status.textContent = rendered.size ? 'LIVE · CREW CHANNEL' : 'LIVE · Be the first to say something.';
+        status.classList.remove('offline');
+        firstLoad = false;
+      } catch (_) {
+        status.textContent = 'SIGNAL LOST · Retrying…';
+        status.classList.add('offline');
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = input.value.trim().replace(/\s+/g,' ');
+      if (!text) return;
+
+      input.disabled = true;
+      try {
+        const res = await fetch('{{ url_for("crew_chat_post") }}', {
+          method:'POST',
+          credentials:'same-origin',
+          headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+          body:JSON.stringify({text})
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          status.textContent = data.error || 'Message failed.';
+          status.classList.add('offline');
+          return;
+        }
+        input.value = '';
+        count.textContent = '0';
+        addMessage(data.message, true);
+        status.textContent = 'LIVE · CREW CHANNEL';
+        status.classList.remove('offline');
+      } catch (_) {
+        status.textContent = 'Message failed. Try again.';
+        status.classList.add('offline');
+      } finally {
+        input.disabled = false;
+        input.focus();
+      }
+    });
+
+    input.addEventListener('input', () => count.textContent = String(input.value.length));
+    refresh();
+    setInterval(refresh, 2500);
+  })();
+  </script>
+</body>
+</html>
